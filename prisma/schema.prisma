@@ -1,0 +1,214 @@
+datasource db {
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model User {
+    id               String             @id @default(cuid())
+    name             String?
+    username         String?            @unique
+    email            String?            @unique
+    emailVerified    DateTime?
+    image            String?
+    accounts         Account[]
+    sessions         Session[]
+    financialProfile FinancialProfile[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Account {
+    id                       String  @id @default(cuid())
+    userId                   String  @unique
+    type                     String
+    provider                 String
+    providerAccountId        String
+    refresh_token            String? @db.Text
+    access_token             String? @db.Text
+    expires_at               Int?
+    token_type               String?
+    scope                    String?
+    id_token                 String? @db.Text
+    session_state            String?
+    refresh_token_expires_in Int?
+    user                     User?   @relation(fields: [userId], references: [id])
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([provider, providerAccountId])
+    @@index([userId])
+}
+
+model Session {
+    id           String   @id @default(cuid())
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id])
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([userId])
+}
+
+model VerificationToken {
+    identifier String
+    token      String
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
+
+model FinancialProfile {
+    id            String        @id @default(cuid())
+    name          String        @db.Text
+    description   String?       @db.Text
+    userId        String        @unique
+    netWorth      Decimal       @default(0) @db.Decimal(10, 2)
+    totalIncome   Decimal       @default(0) @db.Decimal(10, 2)
+    totalExpenses Decimal       @default(0) @db.Decimal(10, 2)
+    currency      String        @default("PHP")
+    wallets       Wallet[]
+    budgets       Budget[]
+    transactions  Transaction[]
+    savingsGoals  SavingsGoal[]
+    user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([userId])
+}
+
+model Wallet {
+    id                 String           @id @default(cuid())
+    financialProfileId String
+    name               String           @db.Text
+    description        String?          @db.Text
+    balance            Decimal          @default(0) @db.Decimal(10, 2)
+    type               WalletType       @default(GENERAL)
+    isDefault          Boolean          @default(false)
+    transactions       Transaction[]
+    financialProfile   FinancialProfile @relation(fields: [financialProfileId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([financialProfileId])
+}
+
+enum WalletType {
+    GENERAL
+    CASH
+    BANK
+    E_WALLET
+    CREDIT_CARD
+    SAVINGS_ACCOUNT
+    INSURANCE
+    INVESTMENT
+}
+
+model Transaction {
+    id                 String            @id @default(cuid())
+    description        String
+    category           String
+    amount             Decimal           @default(0) @db.Decimal(10, 2)
+    type               TransactionType
+    status             TransactionStatus @default(COMPLETED)
+    walletId           String
+    wallet             Wallet            @relation(fields: [walletId], references: [id], onDelete: Cascade)
+    financialProfileId String
+    financialProfile   FinancialProfile  @relation(fields: [financialProfileId], references: [id], onDelete: Cascade)
+    budgetId           String?
+    budget             Budget?           @relation(fields: [budgetId], references: [id])
+    savingsGoalId      String?
+    savingsGoal        SavingsGoal?      @relation(fields: [savingsGoalId], references: [id])
+    date               DateTime          @default(now())
+    updatedAt          DateTime          @updatedAt
+
+    @@index([walletId])
+    @@index([financialProfileId])
+    @@index([budgetId])
+    @@index([savingsGoalId])
+}
+
+enum TransactionType {
+    INCOME
+    EXPENSE
+    TRANSFER
+    SAVINGS
+}
+
+enum TransactionStatus {
+    PENDING
+    COMPLETED
+    FAILED
+    CANCELLED
+}
+
+model Budget {
+    id                 String           @id @default(cuid())
+    financialProfileId String
+    name               String
+    category           String
+    amount             Decimal          @default(0) @db.Decimal(10, 2)
+    spent              Decimal          @default(0) @db.Decimal(10, 2)
+    startDate          DateTime
+    endDate            DateTime
+    isRecurring        Boolean          @default(false)
+    recurringPeriod    RecurringPeriod?
+    transactions       Transaction[]
+    financialProfile   FinancialProfile @relation(fields: [financialProfileId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([financialProfileId])
+}
+
+enum RecurringPeriod {
+    DAILY
+    WEEKLY
+    MONTHLY
+    YEARLY
+}
+
+model SavingsGoal {
+    id                 String           @id @default(cuid())
+    financialProfileId String
+    title              String
+    description        String?
+    targetAmount       Decimal          @db.Decimal(10, 2)
+    currentAmount      Decimal          @default(0) @db.Decimal(10, 2)
+    dueDate            DateTime?
+    priority           GoalPriority     @default(HIGH)
+    status             GoalStatus       @default(ACTIVE)
+    transactions       Transaction[]
+    financialProfile   FinancialProfile @relation(fields: [financialProfileId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([financialProfileId])
+}
+
+enum GoalStatus {
+    ACTIVE
+    COMPLETED
+    CANCELLED
+    ON_HOLD
+}
+
+enum GoalPriority {
+    LOW
+    MID
+    HIGH
+}
