@@ -9,15 +9,15 @@ generator client {
 }
 
 model User {
-    id               String             @id @default(cuid())
+    id               String            @id @default(cuid())
     name             String?
-    username         String?            @unique
-    email            String?            @unique
+    username         String?           @unique
+    email            String?           @unique
     emailVerified    DateTime?
     image            String?
     accounts         Account[]
     sessions         Session[]
-    financialProfile FinancialProfile[]
+    financialProfile FinancialProfile?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -93,6 +93,7 @@ model Wallet {
     financialProfileId String
     name               String           @db.Text
     description        String?          @db.Text
+    color              String?          @db.Text
     balance            Decimal          @default(0) @db.Decimal(10, 2)
     type               WalletType       @default(GENERAL)
     isDefault          Boolean          @default(false)
