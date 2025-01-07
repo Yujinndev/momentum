@@ -8,7 +8,7 @@ export default function Home() {
       <main className="row-start-2 flex flex-col items-center gap-8 sm:items-start">
         <div className="mx-auto flex w-3/5 items-center justify-between gap-8 border-b pb-8">
           <div className="w-full">
-            <Brand className="w-full border-0 text-3xl" />
+            <Brand className="w-full justify-center border-0 text-3xl" />
             <Button variant="secondary" className="px-6" asChild>
               <Link href="/auth/signin">Start stepping up!</Link>
             </Button>

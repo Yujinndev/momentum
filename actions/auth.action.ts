@@ -1,11 +1,15 @@
 'use server'
 
 import { signIn, signOut } from '@/auth'
+import { cookies } from 'next/headers'
 
-export async function logout() {
+export const logout = async () => {
   await signOut({ redirectTo: '/auth/signin' })
 }
 
-export async function signinWithGoogle() {
+export const signinWithGoogle = async () => {
   await signIn('google', { redirectTo: '/dashboard' })
+
+  const cookieStore = await cookies()
+  cookieStore.delete('account:state')
 }

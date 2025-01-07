@@ -11,8 +11,7 @@ export function ThemeToggle() {
   return (
     <Button
       variant="outline"
-      size="lg"
-      className="flex w-full justify-start gap-6 p-4"
+      size="icon"
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
     >
       {theme === 'light' ? (
@@ -20,8 +19,6 @@ export function ThemeToggle() {
       ) : (
         <Moon className="h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
       )}
-
-      <p className="capitalize">{theme} theme</p>
     </Button>
   )
 }

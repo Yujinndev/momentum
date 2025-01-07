@@ -1,18 +1,23 @@
+import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Goal } from 'lucide-react'
-import Link from 'next/link'
 
-export const Brand = ({ className }: { className?: string }) => {
+export const Brand = ({
+  className,
+  children,
+}: {
+  className?: string
+  children?: React.ReactNode
+}) => {
   return (
-    <Link
-      href="/"
-      className={cn(
-        'flex items-center gap-2 border-b border-white/10 p-2 pb-4 font-bold',
-        className
-      )}
+    <div
+      className={cn('flex w-full border-b border-white/10 p-2 pb-4', className)}
     >
-      <Goal className="size-6" />
-      Momentum.
-    </Link>
+      <Link href="/" className="flex w-full items-center gap-2 font-bold">
+        <Goal className="size-6" />
+        Momentum.
+      </Link>
+      {children}
+    </div>
   )
 }

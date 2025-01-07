@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { Brand } from '@/components/brand'
 import { Button } from '@/components/ui/button'
 import { getErrorMessage } from '@/utils/error-handler'
+import { ThemeToggle } from '@/components/theme/toggle'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
   Card,
@@ -29,7 +30,9 @@ export default function Page() {
           </Alert>
         )}
         <Card className="space-y-1 px-4 py-6">
-          <Brand />
+          <Brand>
+            <ThemeToggle />
+          </Brand>
 
           <CardHeader className="text-center">
             <CardTitle className="text-xl">Welcome back</CardTitle>
