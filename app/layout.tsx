@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { cn } from '@/lib/utils'
 import { Rubik } from 'next/font/google'
-import { SessionProvider } from 'next-auth/react'
-import { ThemeProvider } from '@/components/theme/theme-provider'
+import Providers from '@/app/providers'
+
 import './globals.css'
 
 const rubik = Rubik({
@@ -24,16 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={cn('min-h-screen', rubik.className)}>
-        <SessionProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
-        </SessionProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

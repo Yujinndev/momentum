@@ -1,6 +1,6 @@
 'use client'
 
-import { signinWithGoogle } from '@/actions/auth.action'
+import { signinWithGoogle } from '@/actions/account/auth.action'
 import { useSearchParams } from 'next/navigation'
 import { Brand } from '@/components/brand'
 import { Button } from '@/components/ui/button'

@@ -60,5 +60,5 @@ export const validateAccountCreationStatus = async () => {
     }
   }
 
-  redirect('/profile/completion')
+  redirect('/auth/account/completion')
 }

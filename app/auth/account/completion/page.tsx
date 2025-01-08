@@ -3,14 +3,11 @@
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  FinancialProfile,
-  financialProfileSchema,
-} from '@/actions/account/schema'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { CURRENCIES } from '@/constants/choices'
 import { SectionLayout } from '@/components/layout/section-layout'
+import { FinancialProfile, financialProfileSchema } from '@/types/profile'
 import { createFinancialProfile } from '@/actions/account/create-financial-profile'
 import {
   Form,

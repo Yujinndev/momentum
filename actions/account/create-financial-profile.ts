@@ -2,7 +2,7 @@
 
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
-import { FinancialProfile } from './schema'
+import { FinancialProfile } from '@/types/profile'
 
 export const createFinancialProfile = async (data: FinancialProfile) => {
   const user = await auth()
