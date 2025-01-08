@@ -46,7 +46,7 @@ type ColorScheme = {
   value: string
 }
 
-export const WALLET_COLORSCHEMES: ColorScheme[] = [
+export const COLORSCHEMES: ColorScheme[] = [
   {
     primary: 'bg-black',
     secondary: 'bg-neutral-800',

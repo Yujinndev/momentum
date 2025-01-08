@@ -7,7 +7,7 @@ type Navigation = {
   icon: LucideIcon
 }
 
-export const NAVIGATION_MENU: Navigation[] = [
+export const NAVIGATIONS: Navigation[] = [
   {
     name: 'Dashboard',
     description: 'Keep track, Assess, and Enhance your financial momentum',
@@ -16,8 +16,9 @@ export const NAVIGATION_MENU: Navigation[] = [
   },
   {
     name: 'Transactions',
-    description: 'Check your transaction history',
-    url: '/dashboard/transactions',
+    description:
+      'Stay informed and in control of your spending and income history.',
+    url: '/transactions',
     icon: ReceiptText,
   },
 ]

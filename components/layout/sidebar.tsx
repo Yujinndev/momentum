@@ -4,13 +4,15 @@ import * as React from 'react'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
-import { logout } from '@/actions/auth.action'
+import { logout } from '@/actions/account/auth.action'
 import { LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Brand } from '@/components/brand'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { NAVIGATIONS } from '@/constants/navigation'
+import { ThemeToggle } from '@/components/theme/toggle'
 import {
   Sidebar,
   SidebarContent,
@@ -23,8 +25,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import { NAVIGATION_MENU } from '@/constants/navigation'
-import { ThemeToggle } from '../theme/toggle'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = useSession()
@@ -49,13 +49,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
 
           <SidebarMenu>
-            {NAVIGATION_MENU.map((item) => (
+            {NAVIGATIONS.map((item) => (
               <SidebarMenuItem key={item.name}>
                 <SidebarMenuButton
                   tooltip={item.name}
                   className={cn('hover:bg-accent', {
                     'bg-primary text-white hover:bg-primary/80 hover:text-gray-100':
-                      pathname === item.url,
+                      pathname.startsWith(item.url),
                   })}
                   asChild
                 >

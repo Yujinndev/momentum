@@ -86,3 +86,7 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.polygon {
+  clip-path: polygon(0% 0%, 45% 0%, 70% 50%, 45% 100%, 0% 100%);
+}
