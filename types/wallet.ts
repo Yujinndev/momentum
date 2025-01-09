@@ -4,7 +4,7 @@ export const walletSchema = z.object({
   name: z.string().min(1, 'Name is required.'),
   description: z.string(),
   color: z.enum(['BLACK', 'WHITE', 'GREEN', 'RED', 'ORANGE', 'BLUE', 'PURPLE']),
-  balance: z.coerce.number().positive().finite(),
+  balance: z.coerce.number().nonnegative().finite(),
   type: z.enum([
     'GENERAL',
     'CASH',
