@@ -1,54 +1,57 @@
 'use server'
 
-import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { FinancialProfile } from '@/types/profile'
+import { getAuthUser } from '@/actions/account/get-auth-user'
+import { setAccountValidatedCookie } from './cookies'
 
-export const createFinancialProfile = async (data: FinancialProfile) => {
-  const user = await auth()
+type CreateFinancialProfileArgs = {
+  values: FinancialProfile
+}
 
-  if (!user?.user) {
-    return {
-      error: 'You must be logged in',
-    }
-  }
-
-  const { email } = user.user
-
+export const createFinancialProfile = async ({
+  values,
+}: CreateFinancialProfileArgs) => {
   try {
+    const email = await getAuthUser()
+
     const user = await prisma.user.findFirstOrThrow({
       where: { email },
     })
 
     if (!user) {
-      return {
-        error: 'No user found!',
-      }
+      throw new Error('No user found')
     }
 
     const createdProfile = await prisma.financialProfile.create({
       data: {
         userId: user.id,
-        name: data.name,
-        description: data.description,
-        currency: data.currency,
+        name: values.name,
+        description: values.description,
+        currency: values.currency,
       },
     })
 
-    const serializedProfile = {
+    const userProfile = {
       ...createdProfile,
-      netWorth: Number(createdProfile.netWorth),
       totalIncome: Number(createdProfile.totalIncome),
       totalExpenses: Number(createdProfile.totalExpenses),
     }
 
+    // NOTE: currently not working
+    await setAccountValidatedCookie()
+
     return {
-      success: 'Financial Profile Created Successfully!',
-      profile: serializedProfile,
+      profile: userProfile,
+      message: 'Financial profile created successfully!',
     }
-  } catch {
-    return {
-      error: 'Something went wrong!',
+  } catch (error) {
+    console.log('Create profile account error:', error)
+
+    if (error instanceof Error) {
+      return { error: error.message }
     }
+
+    return { error: 'Failed to create profile account' }
   }
 }

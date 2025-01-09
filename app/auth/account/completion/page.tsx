@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-export default function Page() {
+export default function AccountCompletion() {
   const router = useRouter()
 
   const form = useForm<FinancialProfile>({
@@ -38,7 +38,7 @@ export default function Page() {
   })
 
   async function onSubmit(values: FinancialProfile) {
-    const response = await createFinancialProfile(values)
+    const response = await createFinancialProfile({ values })
 
     if (response.error) {
       return form.setError('root', { message: response.error })

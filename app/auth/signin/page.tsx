@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 
-export default function Page() {
+export default function SignIn() {
   const searchParams = useSearchParams()
   const error = searchParams.get('error')
 

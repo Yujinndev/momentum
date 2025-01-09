@@ -1,13 +1,12 @@
 'use server'
 
-import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
-import { cookies } from 'next/headers'
+import { getAuthUser } from '@/actions/account/get-auth-user'
+import { getAccountValidatedCookie, setAccountValidatedCookie } from './cookies'
 
 export const validateAccountCreationStatus = async () => {
-  const cookieStore = await cookies()
-  const validated = cookieStore.get('account:state')
+  const validated = await getAccountValidatedCookie()
 
   if (validated) {
     return {
@@ -15,49 +14,35 @@ export const validateAccountCreationStatus = async () => {
     }
   }
 
-  const user = await auth()
-
-  if (!user?.user) {
-    return {
-      error: 'You must be logged in',
-    }
-  }
-
-  const { email } = user.user
-
   try {
+    const email = await getAuthUser()
     const user = await prisma.user.findFirstOrThrow({
       where: { email },
-    })
-
-    if (!user) {
-      return {
-        error: 'No user found!',
-      }
-    }
-
-    const profile = await prisma.financialProfile.findFirst({
-      where: {
-        userId: user.id,
+      include: {
+        financialProfile: true,
       },
     })
 
-    if (profile) {
-      cookieStore.set('account:state', 'validated', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 30,
-      })
+    if (!user) {
+      throw new Error('No user found')
+    }
+
+    if (user.financialProfile) {
+      // NOTE: currently not working
+      await setAccountValidatedCookie()
 
       return {
-        success: 'User already finished account creation!',
+        message: 'User already finished account creation!',
       }
     }
-  } catch {
-    return {
-      error: 'Something went wrong!',
+  } catch (error) {
+    console.log('Validate account creation error:', error)
+
+    if (error instanceof Error) {
+      return { error: error.message }
     }
+
+    return { error: 'Failed to validate account creation' }
   }
 
   redirect('/auth/account/completion')

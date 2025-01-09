@@ -72,7 +72,6 @@ model FinancialProfile {
     name          String        @db.Text
     description   String?       @db.Text
     userId        String        @unique
-    netWorth      Decimal       @default(0) @db.Decimal(10, 2)
     totalIncome   Decimal       @default(0) @db.Decimal(10, 2)
     totalExpenses Decimal       @default(0) @db.Decimal(10, 2)
     currency      String        @default("PHP")
@@ -80,6 +79,7 @@ model FinancialProfile {
     budgets       Budget[]
     transactions  Transaction[]
     savingsGoals  SavingsGoal[]
+    categories    Category[]
     user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     createdAt DateTime @default(now())
@@ -93,7 +93,7 @@ model Wallet {
     financialProfileId String
     name               String           @db.Text
     description        String?          @db.Text
-    color              String?          @db.Text
+    color              Color            @default(BLACK)
     balance            Decimal          @default(0) @db.Decimal(10, 2)
     type               WalletType       @default(GENERAL)
     isDefault          Boolean          @default(false)
@@ -133,7 +133,10 @@ model Transaction {
     savingsGoalId      String?
     savingsGoal        SavingsGoal?      @relation(fields: [savingsGoalId], references: [id])
     date               DateTime          @default(now())
-    updatedAt          DateTime          @updatedAt
+
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    deletedAt DateTime?
 
     @@index([walletId])
     @@index([financialProfileId])
@@ -212,4 +215,25 @@ enum GoalPriority {
     LOW
     MID
     HIGH
+}
+
+model Category {
+    id                 Int               @id @default(autoincrement())
+    name               String
+    color              Color             @default(BLACK)
+    financialProfileId String?
+    financialProfile   FinancialProfile? @relation(fields: [financialProfileId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+enum Color {
+    BLACK
+    WHITE
+    GREEN
+    RED
+    ORANGE
+    BLUE
+    PURPLE
 }
