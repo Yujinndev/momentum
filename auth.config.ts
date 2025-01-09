@@ -8,7 +8,14 @@ export default {
     error: '/auth/signin',
   },
   callbacks: {
-    authorized: async ({ auth }) => {
+    authorized: async ({ request: { nextUrl }, auth }) => {
+      const isLoggedIn = !!auth?.user
+
+      if (nextUrl.pathname.startsWith('/auth/signin') && isLoggedIn) {
+        const newUrl = new URL('/dashboard', nextUrl.origin)
+        return Response.redirect(newUrl)
+      }
+
       return !!auth
     },
   },
