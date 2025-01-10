@@ -118,21 +118,22 @@ enum WalletType {
 }
 
 model Transaction {
-    id                 String            @id @default(cuid())
-    description        String
-    category           String
-    amount             Decimal           @default(0) @db.Decimal(10, 2)
-    type               TransactionType
-    status             TransactionStatus @default(COMPLETED)
-    walletId           String
-    wallet             Wallet            @relation(fields: [walletId], references: [id], onDelete: Cascade)
-    financialProfileId String
-    financialProfile   FinancialProfile  @relation(fields: [financialProfileId], references: [id], onDelete: Cascade)
-    budgetId           String?
-    budget             Budget?           @relation(fields: [budgetId], references: [id])
-    savingsGoalId      String?
-    savingsGoal        SavingsGoal?      @relation(fields: [savingsGoalId], references: [id])
-    date               DateTime          @default(now())
+    id                   String            @id @default(cuid())
+    description          String
+    category             String
+    amount               Decimal           @default(0) @db.Decimal(10, 2)
+    type                 TransactionType
+    status               TransactionStatus @default(COMPLETED)
+    walletId             String
+    walletRunningBalance Decimal           @default(0) @db.Decimal(10, 2)
+    wallet               Wallet            @relation(fields: [walletId], references: [id], onDelete: Cascade)
+    financialProfileId   String
+    financialProfile     FinancialProfile  @relation(fields: [financialProfileId], references: [id], onDelete: Cascade)
+    budgetId             String?
+    budget               Budget?           @relation(fields: [budgetId], references: [id])
+    savingsGoalId        String?
+    savingsGoal          SavingsGoal?      @relation(fields: [savingsGoalId], references: [id])
+    date                 DateTime          @default(now())
 
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt

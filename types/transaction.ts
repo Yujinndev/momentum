@@ -1,7 +1,6 @@
 import { z } from 'zod'
 
 export const transactionSchema = z.object({
-  id: z.string().nullable(),
   description: z.string().min(1, { message: 'Description is required.' }),
   category: z.string().min(1, { message: 'Category is required.' }),
   amount: z.coerce.number().positive().finite(),
@@ -15,20 +14,3 @@ export const transactionSchema = z.object({
 })
 
 export type Transaction = z.infer<typeof transactionSchema>
-export type TransactionWithID = Transaction & { id: number }
-
-// description        String
-// category           String
-// amount             Decimal           @default(0) @db.Decimal(10, 2)
-// type               TransactionType
-// status             TransactionStatus @default(COMPLETED)
-// walletId           String
-// wallet             Wallet            @relation(fields: [walletId], references: [id], onDelete: Cascade)
-// financialProfileId String
-// financialProfile   FinancialProfile  @relation(fields: [financialProfileId], references: [id], onDelete: Cascade)
-// budgetId           String?
-// budget             Budget?           @relation(fields: [budgetId], references: [id])
-// savingsGoalId      String?
-// savingsGoal        SavingsGoal?      @relation(fields: [savingsGoalId], references: [id])
-// date               DateTime          @default(now())
-// updatedAt          DateTime          @updatedAt
