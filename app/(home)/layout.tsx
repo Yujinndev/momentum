@@ -11,12 +11,12 @@ export default async function DashboardLayout({
   await validateAccountCreationStatus()
 
   return (
-    <section>
+    <section className="overflow-x-hidden">
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
           <Header />
-          <div className="px-2 pt-6">{children}</div>
+          <main>{children}</main>
         </SidebarInset>
       </SidebarProvider>
     </section>

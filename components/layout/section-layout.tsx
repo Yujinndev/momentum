@@ -1,5 +1,20 @@
-export const SectionLayout = ({ children }: { children: React.ReactNode }) => {
+import { cn } from '@/lib/utils'
+
+export const SectionLayout = ({
+  children,
+  className,
+}: {
+  children: React.ReactNode
+  className?: string
+}) => {
   return (
-    <div className="relative mx-auto max-w-screen-xl py-20">{children}</div>
+    <section
+      className={cn(
+        'relative mx-auto max-w-screen-2xl px-4 py-8 pr-6',
+        className
+      )}
+    >
+      {children}
+    </section>
   )
 }

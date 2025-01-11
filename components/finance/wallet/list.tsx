@@ -30,7 +30,7 @@ export function WalletList() {
   return (
     <div className="relative flex flex-col justify-center gap-4 lg:flex-row">
       <Dialog open={open} onOpenChange={setOpen}>
-        <div className="flex aspect-video h-28 w-full flex-col items-center justify-center gap-2 rounded-xl bg-muted-foreground/10 text-center lg:h-40 lg:w-20">
+        <div className="flex aspect-video h-28 w-full flex-col items-center justify-center gap-2 rounded-xl border bg-muted-foreground/10 text-center lg:h-40 lg:w-20">
           <DialogTrigger asChild>
             <Button variant="outline" className="h-12 w-12 rounded-full">
               <Plus />

@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { cn } from '@/lib/utils'
 import { Rubik } from 'next/font/google'
+import { Toaster } from '@/components/ui/toaster'
 import Providers from '@/app/providers'
-
 import './globals.css'
 
 const rubik = Rubik({
@@ -25,6 +25,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={cn('min-h-screen', rubik.className)}>
         <Providers>{children}</Providers>
+        <Toaster />
       </body>
     </html>
   )
