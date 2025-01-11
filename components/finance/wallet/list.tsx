@@ -1,19 +1,11 @@
 'use client'
 
-import { Plus } from 'lucide-react'
+import { useState } from 'react'
 import { WalletCard } from './card'
 import { AddWalletForm } from './add-form'
 import { useQuery } from '@tanstack/react-query'
-import { Button } from '@/components/ui/button'
+import { DialogFormWrapper } from '@/components/dialog-form-wrapper'
 import { getUserWallets } from '@/actions/finance/wallet/get-user-wallets'
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import { useState } from 'react'
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 
 export function WalletList() {
   const [open, setOpen] = useState<boolean>(false)
@@ -23,28 +15,11 @@ export function WalletList() {
     queryFn: () => getUserWallets(),
   })
 
-  const handleCloseDialog = () => {
-    setOpen(false)
-  }
-
   return (
     <div className="relative flex flex-col justify-center gap-4 lg:flex-row">
-      <Dialog open={open} onOpenChange={setOpen}>
-        <div className="flex aspect-video h-28 w-full flex-col items-center justify-center gap-2 rounded-xl border bg-muted-foreground/10 text-center lg:h-40 lg:w-20">
-          <DialogTrigger asChild>
-            <Button variant="outline" className="h-12 w-12 rounded-full">
-              <Plus />
-            </Button>
-          </DialogTrigger>
-          <h3 className="text-sm font-semibold">Add new wallet</h3>
-        </div>
-        <DialogContent className="sm:max-w-md">
-          <VisuallyHidden>
-            <DialogTitle>Add Wallet Form</DialogTitle>
-          </VisuallyHidden>
-          <AddWalletForm onSubmitCallback={handleCloseDialog} />
-        </DialogContent>
-      </Dialog>
+      <DialogFormWrapper open={open} setOpen={setOpen} title="Add New Wallet">
+        <AddWalletForm onSubmitCallback={() => setOpen(false)} />
+      </DialogFormWrapper>
 
       <div className="grid w-full gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {isSuccess &&
