@@ -28,8 +28,7 @@ export const getUserFinancialProfile = async () => {
 
     return {
       profile: userProfile,
-      currency: user.financialProfile?.currency,
-      message: 'User profile fetched successfully!',
+      success: { message: 'User profile fetched successfully!' },
     }
   } catch (error) {
     console.log('Get user financial profile error:', error)

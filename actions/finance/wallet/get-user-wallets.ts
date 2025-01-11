@@ -35,7 +35,7 @@ export const getUserWallets = async () => {
       items: wallets,
       currency: user.financialProfile.currency,
       financialProfileId: user.financialProfile.id,
-      message: 'User wallets fetched successfully',
+      success: { message: 'User wallets fetched successfully' },
     }
   } catch (error) {
     console.log('Get user wallets error:', error)
