@@ -1,13 +1,19 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
 import { getAuthUser } from '@/actions/account/get-auth-user'
+import { prisma } from '@/lib/prisma'
 
-export const getUserFinancialProfile = async () => {
+export const getUserCategories = async () => {
   try {
+    const defaultCategories = await prisma.category.findMany({
+      where: {
+        financialProfileId: null,
+      },
+    })
+
     const email = await getAuthUser()
 
-    const user = await prisma.user.findFirst({
+    const user = await prisma.user.findFirstOrThrow({
       where: { email },
       include: {
         financialProfile: {
@@ -26,18 +32,17 @@ export const getUserFinancialProfile = async () => {
       throw new Error('Financial profile not found')
     }
 
-    const userProfile = {
-      ...user.financialProfile,
-      totalIncome: Number(user.financialProfile.totalIncome),
-      totalExpenses: Number(user.financialProfile.totalExpenses),
-    }
+    const categories = [
+      ...defaultCategories,
+      ...user.financialProfile.categories,
+    ]
 
     return {
-      profile: userProfile,
-      success: { message: 'User profile fetched successfully!' },
+      items: categories,
+      success: { message: 'User categories fetched successfully' },
     }
   } catch (error) {
-    console.log('Get user financial profile error:', error)
+    console.log('Get user categories error:', error)
 
     if (error instanceof Error) {
       return {
@@ -45,8 +50,6 @@ export const getUserFinancialProfile = async () => {
       }
     }
 
-    return {
-      error: 'Failed to get user financial profile',
-    }
+    return { error: 'Failed to get user categories' }
   }
 }

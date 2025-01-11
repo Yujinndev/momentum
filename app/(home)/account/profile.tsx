@@ -11,10 +11,14 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
-import { CURRENCIES } from '@/constants/choices'
+import { COLORSCHEMES, CURRENCIES } from '@/constants/choices'
 import { cn } from '@/lib/utils'
+import { DialogFormWrapper } from '@/components/dialog-form-wrapper'
+import { useState } from 'react'
+import { AddCategoryForm } from './add-category-form'
 
 export default function Profile() {
+  const [open, setOpen] = useState<boolean>(false)
   const { data, isLoading } = useQuery({
     queryKey: ['profile'],
     queryFn: () => getUserFinancialProfile(),
@@ -79,6 +83,49 @@ export default function Profile() {
             <p className="text-2xl">{profile.totalIncome.toFixed(2)}</p>
           </BentoCard>
         </div>
+      </div>
+
+      <div className="h-full w-1/3">
+        <BentoCard title="Custom Categories" className="w-max flex-col">
+          <div className="grid grid-cols-2 gap-4 py-2">
+            {profile.categories.length > 0 ? (
+              profile.categories.map((category) => {
+                const color = COLORSCHEMES.find(
+                  (scheme) => scheme.value === category.color
+                )
+
+                return (
+                  <div
+                    key={category.id}
+                    className={cn(
+                      'rounded-full px-3 py-1 text-center',
+                      color?.secondary,
+                      color?.text
+                    )}
+                  >
+                    <p className="text-sm">{category.name}</p>
+                  </div>
+                )
+              })
+            ) : (
+              <p className="col-span-2 text-muted-foreground">
+                No categories found
+              </p>
+            )}
+          </div>
+
+          <DialogFormWrapper
+            open={open}
+            setOpen={setOpen}
+            title="Add Custom Category"
+            className="bg-none lg:w-full"
+          >
+            <AddCategoryForm
+              onSubmitCallback={() => setOpen(false)}
+              profileId={profile.id}
+            />
+          </DialogFormWrapper>
+        </BentoCard>
       </div>
     </div>
   )
