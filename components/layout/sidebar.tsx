@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
 import { logout } from '@/actions/account/auth.action'
-import { LogOut } from 'lucide-react'
+import { LogOut, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Brand } from '@/components/brand'
 import { Button } from '@/components/ui/button'
@@ -49,7 +49,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
 
           <SidebarMenu>
-            {NAVIGATIONS.map((item) => (
+            {NAVIGATIONS.filter((nav) => nav.isVisible).map((item) => (
               <SidebarMenuItem key={item.name}>
                 <SidebarMenuButton
                   tooltip={item.name}
@@ -90,12 +90,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <span className="truncate text-xs">{session.user.email}</span>
                 </div>
               </div>
-              <form action={logout} className="flex items-center gap-2">
-                <Button variant="destructive" className="w-full" type="submit">
-                  <LogOut className="size-4" />
-                  Logout
+              <div className="flex items-center gap-2">
+                <Button variant="outline" asChild>
+                  <Link href="/account">
+                    <Settings className="text-foreground" />
+                  </Link>
                 </Button>
-              </form>
+                <form action={logout} className="w-full">
+                  <Button
+                    variant="destructive"
+                    className="w-full"
+                    type="submit"
+                  >
+                    <LogOut className="size-4" />
+                    Logout
+                  </Button>
+                </form>
+              </div>
             </div>
           )}
         </SidebarGroup>
