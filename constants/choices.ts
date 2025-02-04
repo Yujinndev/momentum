@@ -9,6 +9,7 @@ import {
   LineChart,
   PhilippinePeso,
   PiggyBank,
+  ReceiptText,
   Wallet,
 } from 'lucide-react'
 
@@ -36,6 +37,13 @@ export const WALLET_TYPES: ItemWithIcon[] = [
   { label: 'Savings Account', value: 'SAVINGS_ACCOUNT', icon: PiggyBank },
   { label: 'Insurance', value: 'INSURANCE', icon: HandCoins },
   { label: 'Investment', value: 'INVESTMENT', icon: LineChart },
+]
+
+export const TRANSACTION_TYPES: ItemWithIcon[] = [
+  { label: 'Expense', value: 'EXPENSE', icon: ReceiptText },
+  { label: 'Income', value: 'INCOME', icon: Banknote },
+  // { label: 'Transfer to another wallet', value: 'TRANSFER', icon: Banknote },
+  // { label: 'Add to Savings', value: 'SAVINGS', icon: PiggyBank },
 ]
 
 type ColorScheme = {
