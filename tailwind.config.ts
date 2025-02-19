@@ -13,7 +13,7 @@ export default {
     'bg-white',
     {
       pattern:
-        /(bg|text|border)-(green|red|orange|red|purple|pink|blue)-(100|200|300|400|500|600|700|800|900)/,
+        /(bg|text|border)-(green|red|orange|red|purple|pink|blue|neutral)-(100|200|300|400|500|600|700|800|900)/,
     },
   ],
   theme: {
