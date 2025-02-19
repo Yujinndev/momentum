@@ -9,5 +9,9 @@ export const getAuthUser = async () => {
     throw new Error('User must be logged in')
   }
 
-  return user.user.email!
+  if (!user.user.email) {
+    throw new Error('User email not found')
+  }
+
+  return user.user.email
 }

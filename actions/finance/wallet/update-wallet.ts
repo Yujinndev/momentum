@@ -42,7 +42,7 @@ export async function updateWallet({ id, values }: UpdateWalletArgs) {
       }
 
       const wallet = await tx.wallet.update({
-        where: { id },
+        where: { id: userWallet.id },
         data: values,
       })
 
@@ -66,7 +66,7 @@ export async function updateWallet({ id, values }: UpdateWalletArgs) {
         })
       }
 
-      return wallet
+      return { ...wallet, balance: Number(wallet.balance) }
     })
 
     revalidatePath('/dashboard')

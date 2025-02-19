@@ -27,7 +27,7 @@ export const getUserTransactions = async () => {
     }
 
     const transactions = user.financialProfile?.transactions
-    if (!transactions) {
+    if (!transactions || transactions.length < 1) {
       return {
         transactions: [],
         currency: user.financialProfile?.currency,
