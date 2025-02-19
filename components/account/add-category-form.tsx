@@ -74,30 +74,32 @@ export const AddCategoryForm = ({
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="color"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Color</FormLabel>
-                <FormControl>
-                  <div className="flex w-full justify-between">
-                    {COLORSCHEMES.map((color) => (
-                      <div
-                        key={color.value}
-                        className={cn(`h-8 w-8 rounded-full`, color.primary, {
-                          'ring-2 ring-black ring-offset-2':
-                            field.value === color.value,
-                        })}
-                        onClick={() => field.onChange(color.value)}
-                      />
-                    ))}
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="rounded-xl border bg-muted/50 px-6 py-3 pb-5">
+            <FormField
+              control={form.control}
+              name="color"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Color</FormLabel>
+                  <FormControl>
+                    <div className="flex w-full justify-between">
+                      {COLORSCHEMES.map((color) => (
+                        <div
+                          key={color.value}
+                          className={cn(`h-8 w-8 rounded-full`, color.primary, {
+                            'ring-2 ring-black ring-offset-2':
+                              field.value === color.value,
+                          })}
+                          onClick={() => field.onChange(color.value)}
+                        />
+                      ))}
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           {form.formState.errors.root && (
             <div className="text-red-500">
