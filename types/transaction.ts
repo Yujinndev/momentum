@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 export const transactionSchema = z.object({
+  id: z.string().optional(),
   description: z.string().min(1, { message: 'Description is required.' }),
   amount: z.coerce
     .number()
