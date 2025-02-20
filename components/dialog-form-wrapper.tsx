@@ -43,7 +43,7 @@ export const DialogFormWrapper = ({
         </DialogTrigger>
         <h3 className="text-sm font-semibold">{title}</h3>
       </div>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-md lg:max-w-screen-lg">
         <VisuallyHidden>
           <DialogTitle>{title}</DialogTitle>
         </VisuallyHidden>
