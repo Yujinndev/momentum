@@ -47,60 +47,76 @@ export const TRANSACTION_TYPES: ItemWithIcon[] = [
 ]
 
 type ColorScheme = {
+  base: string
   primary: string
   secondary: string
   accent: string
+  border: string
   text: string
   value: string
 }
 
 export const COLORSCHEMES: ColorScheme[] = [
   {
+    base: 'black',
     primary: 'bg-black',
     secondary: 'bg-neutral-800',
     accent: 'bg-neutral-700',
+    border: 'border-neutral-700',
     text: 'text-white',
     value: 'BLACK',
   },
   {
+    base: 'white',
     primary: 'bg-white',
     secondary: 'bg-neutral-200',
     accent: 'bg-neutral-300',
+    border: 'border-neutral-300',
     text: 'text-black',
     value: 'WHITE',
   },
   {
+    base: 'green',
     primary: 'bg-green-700',
     secondary: 'bg-green-500',
     accent: 'bg-green-300',
+    border: 'border-green-300',
     text: 'text-black',
     value: 'GREEN',
   },
   {
+    base: 'red',
     primary: 'bg-red-700',
     secondary: 'bg-red-500',
     accent: 'bg-red-300',
+    border: 'border-red-300',
     text: 'text-black',
     value: 'RED',
   },
   {
+    base: 'orange',
     primary: 'bg-orange-700',
     secondary: 'bg-orange-500',
     accent: 'bg-orange-300',
+    border: 'border-orange-300',
     text: 'text-black',
     value: 'ORANGE',
   },
   {
+    base: 'blue',
     primary: 'bg-blue-700',
     secondary: 'bg-blue-500',
     accent: 'bg-blue-300',
+    border: 'border-blue-300',
     text: 'text-black',
     value: 'BLUE',
   },
   {
+    base: 'purple',
     primary: 'bg-purple-700',
     secondary: 'bg-purple-500',
     accent: 'bg-purple-300',
+    border: 'border-purple-300',
     text: 'text-black',
     value: 'PURPLE',
   },

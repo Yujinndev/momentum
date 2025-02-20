@@ -9,6 +9,9 @@ export default {
   ],
   safelist: [
     'text-black',
+    'text-white',
+    'border-black',
+    'border-white',
     'bg-black',
     'bg-white',
     {
