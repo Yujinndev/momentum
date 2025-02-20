@@ -3,7 +3,6 @@
 import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
 import { ColumnDef } from '@tanstack/react-table'
-import { Transaction } from '@prisma/client'
 import { MoreHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -20,6 +19,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { CategoryCell } from './category-cell'
 import { TRANSACTION_TYPES } from '@/constants/choices'
+import { Transaction } from '@/types/transaction'
 
 export const displayColumns: ColumnDef<Transaction>[] = [
   {
@@ -189,6 +189,22 @@ export const allColumns: ColumnDef<Transaction>[] = [
     },
   },
   {
+    accessorKey: 'walletId',
+    header: ({ column }) => (
+      <div className="flex w-full items-center justify-end">
+        <DataTableColumnHeader column={column} title="Wallet" />
+      </div>
+    ),
+    cell: ({ row }) => {
+      const walletId: string = row.getValue('walletId')
+      return (
+        <div className="flex w-full items-center justify-end">
+          <WalletCell walletId={walletId} />
+        </div>
+      )
+    },
+  },
+  {
     accessorKey: 'walletRunningBalance',
     header: ({ column }) => (
       <div className="flex w-full items-center justify-end">
@@ -203,22 +219,6 @@ export const allColumns: ColumnDef<Transaction>[] = [
       }).format(amount)
 
       return <div className="text-right font-medium">{formatted}</div>
-    },
-  },
-  {
-    accessorKey: 'walletId',
-    header: ({ column }) => (
-      <div className="flex w-full items-center justify-end">
-        <DataTableColumnHeader column={column} title="Wallet" />
-      </div>
-    ),
-    cell: ({ row }) => {
-      const walletId: string = row.getValue('walletId')
-      return (
-        <div className="flex w-full items-center justify-end">
-          <WalletCell walletId={walletId} />
-        </div>
-      )
     },
   },
   {
@@ -237,11 +237,10 @@ export const allColumns: ColumnDef<Transaction>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem onClick={() => {}}>
-              Copy payment ID {transaction.id}
+              Copy transaction ID {transaction.id}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem>View transaction</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )

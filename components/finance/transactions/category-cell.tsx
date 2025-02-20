@@ -2,33 +2,36 @@
 
 import { cn } from '@/lib/utils'
 import { useQuery } from '@tanstack/react-query'
-import { COLORSCHEMES } from '@/constants/choices'
+import { Skeleton } from '@/components/ui/skeleton'
+import { getColorScheme } from '@/utils/get-values-from-choices'
 import { getUserCategories } from '@/actions/finance/category/get-user-categories'
 
-interface WalletCellProps {
+type WalletCellProps = {
   categoryId: number
 }
 
 export function CategoryCell({ categoryId }: WalletCellProps) {
-  const { data: categories } = useQuery({
+  const { data: categories, isSuccess } = useQuery({
     queryKey: ['categories'],
     queryFn: () => getUserCategories(),
   })
 
+  if (!isSuccess) return <Skeleton />
+
   const category = categories?.items?.find(
     (category) => category.id === categoryId
   )
-  const color = COLORSCHEMES.find((scheme) => scheme.value === category?.color)
+
+  const color = getColorScheme(category?.color!)
 
   return (
-    <span
+    <div
       className={cn(
-        'rounded-full px-2 py-1 text-right text-xs font-medium',
-        color?.secondary,
-        color?.text
+        `w-28 rounded-full border bg-muted-foreground/10 px-2 py-1 text-center text-xs font-medium`,
+        color.border
       )}
     >
       {category?.name}
-    </span>
+    </div>
   )
 }

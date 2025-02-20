@@ -22,7 +22,7 @@ export default function TransactionsTable({
     <div className="container mx-auto">
       <DataTable
         variant={variant}
-        data={transactions?.transactions}
+        data={transactions?.transactions ?? []}
         columns={variant === 'FULL' ? allColumns : displayColumns}
       />
     </div>
