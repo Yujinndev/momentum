@@ -1,8 +1,9 @@
 import { z } from 'zod'
 
 export const walletSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(1, 'Name is required.'),
-  description: z.string(),
+  description: z.string().nullable(),
   color: z.enum(['BLACK', 'WHITE', 'GREEN', 'RED', 'ORANGE', 'BLUE', 'PURPLE']),
   balance: z.coerce.number().nonnegative().finite(),
   type: z.enum([
