@@ -1,3 +1,5 @@
+'use server'
+
 import { getAuthUser } from '@/actions/account/get-auth-user'
 import { prisma } from '@/lib/prisma'
 
@@ -35,8 +37,11 @@ export const deleteWallet = async ({ id }: DeleteWalletArgs) => {
       throw new Error('Wallet not found or unauthorized access')
     }
 
-    await prisma.wallet.findFirst({
-      where: { id },
+    await prisma.wallet.update({
+      where: { id: userWallet.id },
+      data: {
+        deletedAt: new Date(),
+      },
     })
 
     return {

@@ -12,7 +12,11 @@ export const getUserWallets = async () => {
       include: {
         financialProfile: {
           include: {
-            wallets: true,
+            wallets: {
+              where: {
+                deletedAt: { equals: null },
+              },
+            },
           },
         },
       },
