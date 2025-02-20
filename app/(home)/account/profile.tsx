@@ -1,8 +1,7 @@
 'use client'
 
-import { getUserFinancialProfile } from '@/actions/account/get-user-financial-profile'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { cn } from '@/lib/utils'
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -11,11 +10,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
-import { COLORSCHEMES, CURRENCIES } from '@/constants/choices'
-import { cn } from '@/lib/utils'
+import { useQuery } from '@tanstack/react-query'
+import { COLORSCHEMES } from '@/constants/choices'
+import { Skeleton } from '@/components/ui/skeleton'
+import { FinanceStats } from '@/components/finance/stats'
 import { DialogFormWrapper } from '@/components/dialog-form-wrapper'
-import { useState } from 'react'
-import { AddCategoryForm } from './add-category-form'
+import { AddCategoryForm } from '@/components/account/add-category-form'
+import { getUserFinancialProfile } from '@/actions/account/get-user-financial-profile'
 
 export default function Profile() {
   const [open, setOpen] = useState<boolean>(false)
@@ -27,9 +28,6 @@ export default function Profile() {
   if (!data?.profile || isLoading) return <Skeleton />
 
   const { profile } = data
-  const currency = CURRENCIES.find(
-    (currency) => currency.value === profile.currency
-  )
 
   return (
     <div className="relative flex h-full gap-4">
@@ -55,34 +53,7 @@ export default function Profile() {
           </div>
         </div>
 
-        <div className="flex w-full gap-4">
-          <BentoCard title="Currency" className="flex-col">
-            {currency?.icon && (
-              <currency.icon size={40} className="rounded-full" />
-            )}
-            <p>{currency?.label}</p>
-          </BentoCard>
-
-          <BentoCard
-            title="Total Expenses"
-            className="pb-5 text-red-400 dark:text-red-600"
-          >
-            {currency?.icon && (
-              <currency.icon size={16} className="rounded-full" />
-            )}
-            <p className="text-2xl">{profile.totalExpenses.toFixed(2)}</p>
-          </BentoCard>
-
-          <BentoCard
-            title="Total Income"
-            className="pb-5 text-green-400 dark:text-green-600"
-          >
-            {currency?.icon && (
-              <currency.icon size={16} className="rounded-full" />
-            )}
-            <p className="text-2xl">{profile.totalIncome.toFixed(2)}</p>
-          </BentoCard>
-        </div>
+        <FinanceStats />
       </div>
 
       <div className="h-full w-1/3">
