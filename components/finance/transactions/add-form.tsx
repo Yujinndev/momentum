@@ -300,7 +300,9 @@ export default function AddTransactionForm() {
                 className="w-full"
                 disabled={form.formState.isSubmitting}
               >
-                {form.formState.isSubmitting ? 'Creating...' : 'Create'}
+                {form.formState.isSubmitting
+                  ? FORM_DETAIL.cta.pending
+                  : FORM_DETAIL.cta.default}
               </Button>
             </div>
           </div>
