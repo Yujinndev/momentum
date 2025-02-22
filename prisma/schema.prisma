@@ -121,8 +121,8 @@ enum WalletType {
 model Transaction {
     id                   String            @id @default(cuid())
     description          String
-    categoryId           Int
-    category             Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+    categoryId           Int?
+    category             Category?         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
     amount               Decimal           @default(0) @db.Decimal(10, 2)
     type                 TransactionType
     status               TransactionStatus @default(COMPLETED)
@@ -155,17 +155,14 @@ enum TransactionType {
 }
 
 enum TransactionStatus {
-    PENDING
+    SCHEDULED
     COMPLETED
-    FAILED
-    CANCELLED
 }
 
 model Budget {
     id                 String           @id @default(cuid())
     financialProfileId String
     name               String
-    category           String
     amount             Decimal          @default(0) @db.Decimal(10, 2)
     spent              Decimal          @default(0) @db.Decimal(10, 2)
     startDate          DateTime
