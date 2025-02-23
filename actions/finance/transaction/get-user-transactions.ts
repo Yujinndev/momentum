@@ -12,7 +12,9 @@ export const getUserTransactions = async () => {
       include: {
         financialProfile: {
           include: {
-            transactions: true,
+            transactions: {
+              orderBy: { date: 'desc' },
+            },
           },
         },
       },
@@ -47,11 +49,6 @@ export const getUserTransactions = async () => {
     }
   } catch (error) {
     console.log('Get user transactions error:', error)
-
-    if (error instanceof Error) {
-      return { error: error.message }
-    }
-
-    return { error: 'Failed to get user transactions' }
+    throw error
   }
 }
