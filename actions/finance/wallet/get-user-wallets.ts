@@ -43,11 +43,6 @@ export const getUserWallets = async () => {
     }
   } catch (error) {
     console.log('Get user wallets error:', error)
-
-    if (error instanceof Error) {
-      return { error: error.message }
-    }
-
-    return { error: 'Failed to get user wallets' }
+    throw error
   }
 }
