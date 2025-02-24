@@ -1,5 +1,5 @@
+import { ColorScheme, ItemWithIcon } from '@/types/choices'
 import {
-  type LucideIcon,
   Banknote,
   Coins,
   CreditCard,
@@ -10,25 +10,16 @@ import {
   PhilippinePeso,
   PiggyBank,
   ReceiptText,
+  Send,
   Wallet,
 } from 'lucide-react'
 
-type Item = {
-  label: string
-  value: string
-}
-
-type Icon = {
-  icon: LucideIcon
-}
-
-type ItemWithIcon = Item & Icon
-export const CURRENCIES: ItemWithIcon[] = [
+export const CURRENCIES = [
   { label: 'Philippine Peso', value: 'PHP', icon: PhilippinePeso },
   { label: 'US Dollar', value: 'USD', icon: DollarSign },
-]
+] satisfies Array<ItemWithIcon>
 
-export const WALLET_TYPES: ItemWithIcon[] = [
+export const WALLET_TYPES = [
   { label: 'General', value: 'GENERAL', icon: Coins },
   { label: 'Cash', value: 'CASH', icon: Banknote },
   { label: 'Bank', value: 'BANK', icon: Landmark },
@@ -37,26 +28,16 @@ export const WALLET_TYPES: ItemWithIcon[] = [
   { label: 'Savings Account', value: 'SAVINGS_ACCOUNT', icon: PiggyBank },
   { label: 'Insurance', value: 'INSURANCE', icon: HandCoins },
   { label: 'Investment', value: 'INVESTMENT', icon: LineChart },
-]
+] satisfies Array<ItemWithIcon>
 
-export const TRANSACTION_TYPES: ItemWithIcon[] = [
+export const TRANSACTION_TYPES = [
   { label: 'Expense', value: 'EXPENSE', icon: ReceiptText },
   { label: 'Income', value: 'INCOME', icon: Banknote },
-  // { label: 'Transfer to another wallet', value: 'TRANSFER', icon: Banknote },
-  // { label: 'Add to Savings', value: 'SAVINGS', icon: PiggyBank },
-]
+  { label: 'Transfer to another wallet', value: 'TRANSFER', icon: Send },
+  { label: 'Add to Savings', value: 'SAVINGS', icon: PiggyBank },
+] satisfies Array<ItemWithIcon>
 
-type ColorScheme = {
-  base: string
-  primary: string
-  secondary: string
-  accent: string
-  border: string
-  text: string
-  value: string
-}
-
-export const COLORSCHEMES: ColorScheme[] = [
+export const COLORSCHEMES = [
   {
     base: 'black',
     primary: 'bg-black',
@@ -120,4 +101,4 @@ export const COLORSCHEMES: ColorScheme[] = [
     text: 'text-black',
     value: 'PURPLE',
   },
-]
+] satisfies Array<ColorScheme>
