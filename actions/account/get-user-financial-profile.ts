@@ -38,15 +38,6 @@ export const getUserFinancialProfile = async () => {
     }
   } catch (error) {
     console.log('Get user financial profile error:', error)
-
-    if (error instanceof Error) {
-      return {
-        error: error.message,
-      }
-    }
-
-    return {
-      error: 'Failed to get user financial profile',
-    }
+    throw error
   }
 }
