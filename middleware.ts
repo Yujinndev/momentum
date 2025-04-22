@@ -5,12 +5,34 @@ export default auth((req) => {
 
   if (nextUrl.pathname === '/') return
 
+  // If not authenticated and not on signin page, redirect to signin
   if (!auth && nextUrl.pathname !== '/auth/signin') {
     const newUrl = new URL('/auth/signin', nextUrl.origin)
     return Response.redirect(newUrl)
   }
 
+  // If authenticated but needs onboarding and not on onboarding page
+  if (
+    auth &&
+    auth.user.onboardingCompleted === false &&
+    !nextUrl.pathname.includes('/onboarding')
+  ) {
+    const newUrl = new URL('/auth/onboarding', nextUrl.origin)
+    return Response.redirect(newUrl)
+  }
+
+  // If authenticated and on signin page, redirect to dashboard
   if (auth && nextUrl.pathname === '/auth/signin') {
+    const newUrl = new URL('/dashboard', nextUrl.origin)
+    return Response.redirect(newUrl)
+  }
+
+  // If authenticated, completed onboarding, but trying to access onboarding page
+  if (
+    auth &&
+    auth.user.onboardingCompleted === true &&
+    nextUrl.pathname.startsWith('/onboarding')
+  ) {
     const newUrl = new URL('/dashboard', nextUrl.origin)
     return Response.redirect(newUrl)
   }
