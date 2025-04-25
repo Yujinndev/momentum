@@ -22,9 +22,6 @@ export const getWalletById = (wallets: Wallet[], value: string) => {
   return wallet
 }
 
-export const getCurrency = (value: string) => {
-  const currency = CURRENCIES.find((currency) => currency.value === value)
-  if (!currency) throw new Error('No wallet found')
-
-  return currency
+export const getDefaultCurrency = () => {
+  return CURRENCIES[0]
 }
