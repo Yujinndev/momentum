@@ -7,7 +7,7 @@ export const getDefaultCategories = async () => {
   try {
     const categories = await prisma.category.findMany({
       where: {
-        financialProfileId: null,
+        userId: null,
       },
     })
 

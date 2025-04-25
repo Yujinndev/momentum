@@ -7,20 +7,15 @@ export const getUserCategories = async () => {
   try {
     const defaultCategories = await prisma.category.findMany({
       where: {
-        financialProfileId: null,
+        userId: null,
       },
     })
 
     const email = await getAuthUser()
-
     const user = await prisma.user.findFirstOrThrow({
       where: { email },
       include: {
-        financialProfile: {
-          include: {
-            categories: true,
-          },
-        },
+        categories: true,
       },
     })
 
@@ -28,14 +23,7 @@ export const getUserCategories = async () => {
       throw new Error('User not found')
     }
 
-    if (!user.financialProfile) {
-      throw new Error('Financial profile not found')
-    }
-
-    const categories = [
-      ...defaultCategories,
-      ...user.financialProfile.categories,
-    ]
+    const categories = [...defaultCategories, ...user.categories]
 
     return {
       items: categories,
