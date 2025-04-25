@@ -18,12 +18,8 @@ export async function updateWallet({ id, values }: UpdateWalletArgs) {
       const user = await tx.user.findFirstOrThrow({
         where: { email },
         include: {
-          financialProfile: {
-            include: {
-              wallets: {
-                where: { id },
-              },
-            },
+          wallets: {
+            where: { id },
           },
         },
       })
@@ -32,41 +28,26 @@ export async function updateWallet({ id, values }: UpdateWalletArgs) {
         throw new Error('User not found')
       }
 
-      if (!user.financialProfile) {
-        throw new Error('Financial profile not found')
-      }
-
-      const userWallet = user.financialProfile.wallets[0]
-      if (!userWallet) {
+      const wallet = user.wallets[0]
+      if (!wallet) {
         throw new Error('Wallet not found or unauthorized access')
       }
 
-      const wallet = await tx.wallet.update({
-        where: { id: userWallet.id },
+      const updatedWallet = await tx.wallet.update({
+        where: { id: wallet.id },
         data: values,
       })
 
       if (values.isDefault) {
         await tx.wallet.updateMany({
           where: {
-            AND: [
-              {
-                NOT: [
-                  {
-                    id: wallet.id,
-                  },
-                ],
-                isDefault: true,
-              },
-            ],
+            AND: [{ NOT: { id: updatedWallet.id } }, { isDefault: true }],
           },
-          data: {
-            isDefault: false,
-          },
+          data: { isDefault: false },
         })
       }
 
-      return { ...wallet, balance: Number(wallet.balance) }
+      return { ...updatedWallet, balance: Number(updatedWallet.balance) }
     })
 
     revalidatePath('/dashboard')

@@ -10,12 +10,8 @@ export const getUserTransactions = async () => {
     const user = await prisma.user.findFirstOrThrow({
       where: { email },
       include: {
-        financialProfile: {
-          include: {
-            transactions: {
-              orderBy: { date: 'desc' },
-            },
-          },
+        transactions: {
+          orderBy: { transactionDate: 'desc' },
         },
       },
     })
@@ -24,17 +20,7 @@ export const getUserTransactions = async () => {
       throw new Error('User not found')
     }
 
-    if (!user.financialProfile) {
-      throw new Error('Financial profile not found')
-    }
-
-    const transactions = user.financialProfile?.transactions
-    if (!transactions || transactions.length < 1) {
-      return {
-        transactions: [],
-        currency: user.financialProfile?.currency,
-      }
-    }
+    const transactions = user.transactions
 
     const allTransactions = transactions.map((transaction) => ({
       ...transaction,
@@ -44,7 +30,6 @@ export const getUserTransactions = async () => {
 
     return {
       transactions: allTransactions,
-      currency: user.financialProfile?.currency,
       success: { message: 'User transactions fetched successfully' },
     }
   } catch (error) {

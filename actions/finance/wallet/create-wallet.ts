@@ -16,23 +16,16 @@ export const createWallet = async ({ values }: CreateWalletArgs) => {
     const createdWallet = await prisma.$transaction(async (tx) => {
       const user = await tx.user.findFirstOrThrow({
         where: { email },
-        include: {
-          financialProfile: true,
-        },
       })
 
       if (!user) {
         throw new Error('User not found')
       }
 
-      if (!user.financialProfile) {
-        throw new Error('Financial profile not found')
-      }
-
       const wallet = await tx.wallet.create({
         data: {
           ...values,
-          financialProfileId: user.financialProfile.id,
+          userId: user.id,
         },
       })
 

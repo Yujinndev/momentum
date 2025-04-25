@@ -14,12 +14,8 @@ export const deleteWallet = async ({ id }: DeleteWalletArgs) => {
     const user = await prisma.user.findFirstOrThrow({
       where: { email },
       include: {
-        financialProfile: {
-          include: {
-            wallets: {
-              where: { id },
-            },
-          },
+        wallets: {
+          where: { id },
         },
       },
     })
@@ -28,11 +24,7 @@ export const deleteWallet = async ({ id }: DeleteWalletArgs) => {
       throw new Error('User not found')
     }
 
-    if (!user.financialProfile) {
-      throw new Error('Financial profile not found')
-    }
-
-    const userWallet = user.financialProfile?.wallets[0]
+    const userWallet = user?.wallets[0]
     if (!userWallet) {
       throw new Error('Wallet not found or unauthorized access')
     }
