@@ -10,18 +10,14 @@ type CreateWalletArgs = {
 }
 
 export const createWallet = async ({ values }: CreateWalletArgs) => {
+  const { user } = await getAuthUser()
+
   try {
-    const email = await getAuthUser()
+    if (!user) {
+      throw new Error('No user found')
+    }
 
     const createdWallet = await prisma.$transaction(async (tx) => {
-      const user = await tx.user.findFirstOrThrow({
-        where: { email },
-      })
-
-      if (!user) {
-        throw new Error('User not found')
-      }
-
       const wallet = await tx.wallet.create({
         data: {
           ...values,
@@ -32,20 +28,9 @@ export const createWallet = async ({ values }: CreateWalletArgs) => {
       if (values.isDefault) {
         await tx.wallet.updateMany({
           where: {
-            AND: [
-              {
-                NOT: [
-                  {
-                    id: wallet.id,
-                  },
-                ],
-                isDefault: true,
-              },
-            ],
+            AND: [{ NOT: { id: wallet.id } }, { isDefault: true }],
           },
-          data: {
-            isDefault: false,
-          },
+          data: { isDefault: false },
         })
       }
     })
@@ -54,15 +39,9 @@ export const createWallet = async ({ values }: CreateWalletArgs) => {
 
     return {
       wallet: createdWallet,
-      message: 'Wallet created successfully',
+      success: { message: 'Wallet created successfully' },
     }
   } catch (error) {
-    console.log('Create wallet error:', error)
-
-    if (error instanceof Error) {
-      return { error: error.message }
-    }
-
-    return { error: 'Failed to create wallet' }
+    return { error: 'Failed to create wallet', details: error }
   }
 }

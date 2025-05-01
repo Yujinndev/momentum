@@ -4,25 +4,18 @@ import { prisma } from '@/lib/prisma'
 import { getAuthUser } from '@/actions/account/get-auth-user'
 
 export const getUserWallets = async () => {
+  const { user } = await getAuthUser()
+
   try {
-    const email = await getAuthUser()
-
-    const user = await prisma.user.findFirstOrThrow({
-      where: { email },
-      include: {
-        wallets: {
-          where: {
-            deletedAt: { equals: null },
-          },
-        },
-      },
-    })
-
     if (!user) {
-      throw new Error('User not found')
+      throw new Error('No user found')
     }
 
-    const wallets = user.wallets?.map((wallet) => ({
+    const userWallets = await prisma.wallet.findMany({
+      where: { AND: [{ userId: user.id }, { deletedAt: null }] },
+    })
+
+    const wallets = userWallets?.map((wallet) => ({
       ...wallet,
       balance: Number(wallet.balance),
     }))

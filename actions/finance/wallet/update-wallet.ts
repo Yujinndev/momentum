@@ -11,24 +11,20 @@ type UpdateWalletArgs = {
 }
 
 export async function updateWallet({ id, values }: UpdateWalletArgs) {
+  const { user } = await getAuthUser()
+
   try {
-    const email = await getAuthUser()
+    if (!user) {
+      throw new Error('No user found')
+    }
 
     const updatedWallet = await prisma.$transaction(async (tx) => {
-      const user = await tx.user.findFirstOrThrow({
-        where: { email },
-        include: {
-          wallets: {
-            where: { id },
-          },
+      const wallet = await tx.wallet.findFirstOrThrow({
+        where: {
+          AND: [{ userId: user.id }, { id: id }],
         },
       })
 
-      if (!user) {
-        throw new Error('User not found')
-      }
-
-      const wallet = user.wallets[0]
       if (!wallet) {
         throw new Error('Wallet not found or unauthorized access')
       }
@@ -54,15 +50,9 @@ export async function updateWallet({ id, values }: UpdateWalletArgs) {
 
     return {
       wallet: updatedWallet,
-      message: 'Wallet updated successfully',
+      success: { message: 'Wallet updated successfully' },
     }
   } catch (error) {
-    console.log('Wallet update error:', error)
-
-    if (error instanceof Error) {
-      return { error: error.message }
-    }
-
-    return { error: 'Failed to update wallet' }
+    return { error: 'Failed to update wallet', details: error }
   }
 }

@@ -8,46 +8,32 @@ type DeleteWalletArgs = {
 }
 
 export const deleteWallet = async ({ id }: DeleteWalletArgs) => {
-  try {
-    const email = await getAuthUser()
+  const { user } = await getAuthUser()
 
-    const user = await prisma.user.findFirstOrThrow({
-      where: { email },
-      include: {
-        wallets: {
-          where: { id },
-        },
+  try {
+    if (!user) {
+      throw new Error('No user found')
+    }
+
+    const wallet = await prisma.wallet.findFirstOrThrow({
+      where: {
+        AND: [{ userId: user.id }, { id: id }],
       },
     })
 
-    if (!user) {
-      throw new Error('User not found')
-    }
-
-    const userWallet = user?.wallets[0]
-    if (!userWallet) {
+    if (!wallet) {
       throw new Error('Wallet not found or unauthorized access')
     }
 
     await prisma.wallet.update({
-      where: { id: userWallet.id },
-      data: {
-        deletedAt: new Date(),
-      },
+      where: { id: wallet.id },
+      data: { deletedAt: new Date() },
     })
 
     return {
-      message: 'User wallet deleted successfully',
+      success: { message: 'User wallet deleted successfully' },
     }
   } catch (error) {
-    console.log('Wallet deletion error:', error)
-
-    if (error instanceof Error) {
-      return {
-        error: error.message,
-      }
-    }
-
-    return { error: 'Failed to delete wallet' }
+    return { error: 'Failed to delete wallet', details: error }
   }
 }
