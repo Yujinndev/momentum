@@ -3,18 +3,24 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 const main = async () => {
+  await prisma.category.deleteMany()
+
   await prisma.category.createMany({
     data: [
       { name: 'Income' },
       { name: 'Transfer' },
       { name: 'Savings' },
       { name: 'Payments' },
-      { name: 'Health' },
-      { name: 'Groceries' },
-      { name: 'Utilities' },
-      { name: 'Transportation' },
-      { name: 'Education' },
       { name: 'Miscellaneous' },
+      { name: 'Sinking Funds' },
+      { name: 'Medical Expenses' },
+      { name: 'Food/Groceries' },
+      { name: 'Transportation' },
+      { name: 'Utilities' },
+      { name: 'Education' },
+      { name: 'Shopping' },
+      { name: 'Subscriptions' },
+      { name: 'Travel/Vacation' },
     ],
   })
 }

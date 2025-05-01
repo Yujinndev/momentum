@@ -27,6 +27,7 @@ model User {
     categories   Category[]
     transactions Transaction[]
     savingsGoals SavingsGoal[]
+    budgets      Budget[]
 
     @@index([name])
     @@index([email])
@@ -194,7 +195,7 @@ model Category {
 
     // RELATIONS
     user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
-    budget       Budget[]
+    budgets      Budget[]      @relation(name: "BudgetToCategories")
     transactions Transaction[]
 
     @@index([name])
@@ -218,7 +219,7 @@ enum BudgetTracking {
 model Budget {
     id              String           @id @default(cuid())
     name            String
-    total_amount    Decimal          @db.Decimal(10, 2)
+    totalAmount     Decimal          @db.Decimal(10, 2)
     percentage      Float?
     spent           Decimal          @default(0) @db.Decimal(10, 2)
     startDate       DateTime         @db.Timestamptz(6)
@@ -231,10 +232,11 @@ model Budget {
     deletedAt       DateTime?        @db.Timestamptz(6)
 
     // FOREIGN KEYS
-    categoryId Int?
+    userId String
 
     // RELATIONS
-    category     Category?     @relation(fields: [categoryId], references: [id])
+    user         User          @relation(fields: [userId], references: [id])
+    categories   Category[]    @relation(name: "BudgetToCategories")
     transactions Transaction[]
 
     @@index([name])
