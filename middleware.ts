@@ -1,4 +1,5 @@
 import { auth } from '@/auth'
+import { NextResponse } from 'next/server'
 
 export default auth((req) => {
   const { auth, nextUrl } = req
@@ -8,7 +9,7 @@ export default auth((req) => {
   // If not authenticated and not on signin page, redirect to signin
   if (!auth && nextUrl.pathname !== '/auth/signin') {
     const newUrl = new URL('/auth/signin', nextUrl.origin)
-    return Response.redirect(newUrl)
+    return NextResponse.redirect(newUrl)
   }
 
   // If authenticated but needs onboarding and not on onboarding page
@@ -18,13 +19,13 @@ export default auth((req) => {
     !nextUrl.pathname.includes('/onboarding')
   ) {
     const newUrl = new URL('/auth/onboarding', nextUrl.origin)
-    return Response.redirect(newUrl)
+    return NextResponse.redirect(newUrl)
   }
 
   // If authenticated and on signin page, redirect to dashboard
   if (auth && nextUrl.pathname === '/auth/signin') {
     const newUrl = new URL('/dashboard', nextUrl.origin)
-    return Response.redirect(newUrl)
+    return NextResponse.redirect(newUrl)
   }
 
   // If authenticated, completed onboarding, but trying to access onboarding page
@@ -34,8 +35,10 @@ export default auth((req) => {
     nextUrl.pathname.startsWith('/onboarding')
   ) {
     const newUrl = new URL('/dashboard', nextUrl.origin)
-    return Response.redirect(newUrl)
+    return NextResponse.redirect(newUrl)
   }
+
+  return NextResponse.next()
 })
 
 export const config = {
