@@ -3,10 +3,9 @@ import {
   HydrationBoundary,
   QueryClient,
 } from '@tanstack/react-query'
-import { AddTransactionForm } from '@/components/finance/transactions/add-form'
-import { getUserWallets } from '@/actions/finance/wallet/get-user-wallets'
-import { SectionLayout } from '@/components/layout/section-layout'
+import { getUserWallets } from '@/actions/finance/wallet/get-wallets'
 import { getUserCategories } from '@/actions/finance/category/get-user-categories'
+import { AddTransactionForm } from '@/components/finance/transactions/add-form'
 
 export default async function NewTransaction() {
   const queryClient = new QueryClient()
@@ -23,10 +22,8 @@ export default async function NewTransaction() {
   ])
 
   return (
-    <SectionLayout>
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <AddTransactionForm />
-      </HydrationBoundary>
-    </SectionLayout>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <AddTransactionForm />
+    </HydrationBoundary>
   )
 }
