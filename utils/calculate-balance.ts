@@ -1,8 +1,7 @@
-import { Transaction } from '@/types/transaction'
 import { Decimal } from '@prisma/client/runtime/library'
 
 type OperationArgs = {
-  txType: Transaction['type']
+  txType: 'ADD' | 'DEDUCT'
   txAmount: number | Decimal
   currentBalance: number | Decimal
 }
@@ -12,7 +11,7 @@ export const calculateBalance = ({
   txAmount,
   currentBalance,
 }: OperationArgs) => {
-  if (txType === 'INCOME') {
+  if (txType === 'ADD') {
     return Number(currentBalance) + Number(txAmount)
   }
 
