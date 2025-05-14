@@ -4,23 +4,17 @@ import { prisma } from '@/lib/prisma'
 import { getAuthUser } from '@/actions/account/get-auth-user'
 
 export const getUserTransactions = async () => {
+  const { user } = await getAuthUser()
+
   try {
-    const email = await getAuthUser()
-
-    const user = await prisma.user.findFirstOrThrow({
-      where: { email },
-      include: {
-        transactions: {
-          orderBy: { transactionDate: 'desc' },
-        },
-      },
-    })
-
     if (!user) {
-      throw new Error('User not found')
+      throw new Error('No user found')
     }
 
-    const transactions = user.transactions
+    const transactions = await prisma.transaction.findMany({
+      where: { userId: user.id },
+      orderBy: { transactionDate: 'desc' },
+    })
 
     const allTransactions = transactions.map((transaction) => ({
       ...transaction,

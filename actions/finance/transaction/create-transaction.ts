@@ -11,71 +11,86 @@ export type CreateTransactionArgs = {
 }
 
 export const createTransaction = async ({ values }: CreateTransactionArgs) => {
+  const { user } = await getAuthUser()
+
   try {
-    const email = await getAuthUser()
+    if (!user) {
+      throw new Error('No user found')
+    }
 
     const newTransaction = await prisma.$transaction(async (tx) => {
-      const user = await tx.user.findFirstOrThrow({
-        where: { email },
-        include: {
-          financialProfile: {
-            include: {
-              wallets: {
-                where: { id: values.walletId },
-              },
-            },
-          },
+      const walletIDs = [values.walletId]
+
+      if (values.type === 'TRANSFER') {
+        walletIDs.push(values.receivingWalletId)
+      }
+
+      const wallets = await tx.wallet.findMany({
+        where: {
+          AND: [{ userId: user.id }, { id: { in: walletIDs } }],
         },
       })
 
-      if (!user) {
-        throw new Error('User not found')
-      }
+      const transactingWallet = wallets.find(
+        (wallet) => wallet.id === values.walletId
+      )
 
-      if (!user.financialProfile) {
-        throw new Error('Financial profile not found')
-      }
-
-      const userWallet = user.financialProfile.wallets[0]
-
-      if (!userWallet) {
-        throw new Error('Wallet not found or unauthorized access')
+      if (!transactingWallet) {
+        throw new Error('Transacting Wallet not found or unauthorized access')
       }
 
       const { amount, type } = values
       const newBalance = calculateBalance({
-        txType: type,
+        txType: type === 'INCOME' ? 'ADD' : 'DEDUCT',
         txAmount: amount,
-        currentBalance: userWallet.balance,
+        currentBalance: transactingWallet.balance,
       })
 
       const createdTransaction = await tx.transaction.create({
         data: {
           ...values,
+          userId: user.id,
           walletRunningBalance: newBalance,
-          financialProfileId: user.financialProfile.id,
         },
       })
 
-      /* TODO: 
-        CHECK txType IF TRANSFER TO ALSO UPDATE BALANCE OF OTHER WALLET
-        CHECK txType IF TRANSFER TO ALSO UPDATE BALANCE OF OTHER WALLET
-      */
       await tx.wallet.update({
-        where: { id: userWallet.id },
+        where: { id: transactingWallet.id },
         data: {
           balance: newBalance,
         },
       })
 
-      await tx.financialProfile.update({
-        where: { id: user.financialProfile.id },
-        data: {
-          [type === 'EXPENSE' ? 'totalExpenses' : 'totalIncome']: {
-            increment: amount,
+      if (values.type === 'TRANSFER') {
+        const receivingWallet = wallets.find(
+          (wallet) => wallet.id === values.receivingWalletId
+        )
+
+        if (!receivingWallet) {
+          throw new Error('Receiving Wallet not found or unauthorized access')
+        }
+
+        const updatedBalance = calculateBalance({
+          txType: 'ADD',
+          txAmount: amount,
+          currentBalance: receivingWallet.balance,
+        })
+
+        await tx.transaction.create({
+          data: {
+            ...values,
+            userId: user.id,
+            walletRunningBalance: updatedBalance,
           },
-        },
-      })
+        })
+
+        await tx.wallet.update({
+          where: { id: receivingWallet.id },
+          data: {
+            balance: updatedBalance,
+          },
+        })
+      }
 
       return createdTransaction
     })
@@ -94,11 +109,6 @@ export const createTransaction = async ({ values }: CreateTransactionArgs) => {
     }
   } catch (error) {
     console.log('Create transaction error:', error)
-
-    if (error instanceof Error) {
-      return { error: error.message }
-    }
-
-    return { error: 'Failed to create transaction' }
+    throw error
   }
 }

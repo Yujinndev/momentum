@@ -10,15 +10,11 @@ type CreateCategoryArgs = {
 }
 
 export const createCategory = async ({ values }: CreateCategoryArgs) => {
+  const { user } = await getAuthUser()
+
   try {
-    const email = await getAuthUser()
-
-    const user = await prisma.user.findFirstOrThrow({
-      where: { email },
-    })
-
     if (!user) {
-      throw new Error('User not found')
+      throw new Error('No user found.')
     }
 
     const defaultCategories = await getDefaultCategories()
@@ -31,7 +27,12 @@ export const createCategory = async ({ values }: CreateCategoryArgs) => {
     }
 
     const createdCategory = await prisma.category.create({
-      data: values,
+      data: {
+        ...values,
+        user: {
+          connect: { id: user.id },
+        },
+      },
     })
 
     return {
@@ -39,16 +40,9 @@ export const createCategory = async ({ values }: CreateCategoryArgs) => {
       success: { message: 'Category created successfully' },
     }
   } catch (error) {
-    console.log('Category creation error:', error)
-
-    if (error instanceof Error) {
-      return {
-        error: error.message,
-      }
-    }
-
     return {
       error: 'Failed to create category',
+      details: error,
     }
   }
 }
