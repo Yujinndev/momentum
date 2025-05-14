@@ -1,3 +1,4 @@
+import { KeyboardEvent } from 'react'
 import { z } from 'zod'
 
 const numberSchema = z.object({
@@ -5,12 +6,28 @@ const numberSchema = z.object({
 })
 
 export const validateNumber = (value: string) => {
-  if (!value) return 0
-
   const valueToFloat = parseFloat(value)
   const res = numberSchema.safeParse({ number: valueToFloat })
 
-  if (!res.success) return 0
+  const regexValue = value.replace(/[^\d.]/g, '')
+  if (!res.success) return regexValue
 
-  return res.data.number
+  return res.data.number.toString()
+}
+
+export const isValidNumberInput = (event: KeyboardEvent<HTMLInputElement>) => {
+  const allowedKeys = [
+    'Backspace',
+    'Delete',
+    'ArrowLeft',
+    'ArrowRight',
+    'Tab',
+    '.',
+  ]
+
+  if (!/[0-9]/.test(event.key) && !allowedKeys.includes(event.key)) {
+    return false
+  }
+
+  return true
 }
