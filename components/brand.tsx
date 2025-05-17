@@ -1,13 +1,14 @@
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Goal } from 'lucide-react'
+import { ThemeToggle } from '@/components/theme/toggle'
 
 export const Brand = ({
   className,
-  children,
+  showThemeToggle = false,
 }: {
   className?: string
-  children?: React.ReactNode
+  showThemeToggle?: boolean
 }) => {
   return (
     <div
@@ -17,7 +18,8 @@ export const Brand = ({
         <Goal className="size-6" />
         Momentum.
       </Link>
-      {children}
+
+      {showThemeToggle && <ThemeToggle />}
     </div>
   )
 }
