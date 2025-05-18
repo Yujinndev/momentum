@@ -25,15 +25,14 @@ import {
 } from '@/components/ui/select'
 import { FORM_DETAILS } from '@/constants/config'
 import { Checkbox } from '@/components/ui/checkbox'
-import { validateNumber } from '@/utils/validate-number'
-import { WalletCard } from '@/components/finance/wallet/card'
+import { WalletCard } from '@/components/finance/wallet-card'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { COLORSCHEMES, WALLET_TYPES } from '@/constants/choices'
 import { useWalletMutation } from '@/data/mutations/wallet-mutation'
 
 type AddWalletFormProps = {
-  onSubmitCallback?: () => void
   wallet?: Wallet
+  onSubmitCallback?: () => void
 }
 
 export const WalletForm = ({
@@ -42,16 +41,14 @@ export const WalletForm = ({
 }: AddWalletFormProps) => {
   const form = useForm<Wallet>({
     resolver: zodResolver(walletSchema),
-    defaultValues: wallet
-      ? { ...wallet }
-      : {
-          name: '',
-          description: '',
-          balance: 0.0,
-          type: 'CASH',
-          color: 'BLACK',
-          isDefault: false,
-        },
+    defaultValues: wallet ?? {
+      name: '',
+      description: '',
+      balance: 0.0,
+      type: 'CASH',
+      color: 'BLACK',
+      isDefault: false,
+    },
   })
 
   const { mutateAsync, isPending } = useWalletMutation()
@@ -62,7 +59,7 @@ export const WalletForm = ({
   ) => {
     try {
       await mutateAsync({ type, values })
-      onSubmitCallback?.()
+
       form.reset()
     } catch (error: any) {
       form.setError('root', { message: error.message })
@@ -71,6 +68,7 @@ export const WalletForm = ({
 
   const onSubmit = async (values: Wallet) => {
     await handleMutation(wallet ? 'UPDATE' : 'CREATE', values)
+    onSubmitCallback?.()
   }
 
   const handleOnDelete = async () => {
@@ -96,7 +94,7 @@ export const WalletForm = ({
             <div className="space-y-4 lg:col-span-2">
               <WalletCard wallet={form.watch()} />
 
-              <div className="rounded-xl border bg-muted/50 px-6 py-3 pb-5">
+              <div className="rounded-xl border bg-muted/50 px-4 py-3 pb-5">
                 <FormField
                   control={form.control}
                   name="color"
@@ -104,7 +102,7 @@ export const WalletForm = ({
                     <FormItem>
                       <FormLabel>Color</FormLabel>
                       <FormControl>
-                        <div className="flex w-full justify-between">
+                        <div className="flex w-full flex-wrap justify-between">
                           {COLORSCHEMES.map((color) => (
                             <div
                               key={color.value}
@@ -168,14 +166,7 @@ export const WalletForm = ({
                       {wallet ? 'Running Balance' : 'Starting Balance'}
                     </FormLabel>
                     <FormControl>
-                      <CurrencyInput
-                        {...field}
-                        type="number"
-                        onChange={(e) => {
-                          const value = validateNumber(e.target.value)
-                          field.onChange(value)
-                        }}
-                      />
+                      <CurrencyInput {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

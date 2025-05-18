@@ -26,10 +26,8 @@ export const WalletCard = ({ wallet }: { wallet: Wallet }) => {
           {wallet?.name === '' ? 'Wallet Name' : wallet?.name}
         </h2>
         <p className="font-mono text-base">
-          {wallet?.id?.slice(11, 13)}** **** ****
+          {wallet?.id?.slice(-4).padStart(wallet.id.length, '*')}
         </p>
-
-        {/* {wallet.description ?? ''} */}
 
         <div className="flex justify-between pt-8">
           <div>
