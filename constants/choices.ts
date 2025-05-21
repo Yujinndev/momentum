@@ -1,4 +1,4 @@
-import { ColorScheme, ItemWithIcon } from '@/types/choices'
+import { ColorScheme, Choice } from '@/types/choices'
 import {
   Banknote,
   Coins,
@@ -7,7 +7,9 @@ import {
   HandCoins,
   Landmark,
   LineChart,
+  List,
   PhilippinePeso,
+  PieChart,
   PiggyBank,
   ReceiptText,
   Send,
@@ -17,7 +19,7 @@ import {
 export const CURRENCIES = [
   { label: 'Philippine Peso', value: 'PHP', icon: PhilippinePeso },
   { label: 'US Dollar', value: 'USD', icon: DollarSign },
-] satisfies Array<ItemWithIcon>
+] satisfies Array<Choice<string>>
 
 export const WALLET_TYPES = [
   { label: 'General', value: 'GENERAL', icon: Coins },
@@ -28,14 +30,14 @@ export const WALLET_TYPES = [
   { label: 'Savings Account', value: 'SAVINGS_ACCOUNT', icon: PiggyBank },
   { label: 'Insurance', value: 'INSURANCE', icon: HandCoins },
   { label: 'Investment', value: 'INVESTMENT', icon: LineChart },
-] satisfies Array<ItemWithIcon>
+] satisfies Array<Choice<string>>
 
 export const TRANSACTION_TYPES = [
   { label: 'Expense', value: 'EXPENSE', icon: ReceiptText },
   { label: 'Income', value: 'INCOME', icon: Banknote },
-  { label: 'Transfer to another wallet', value: 'TRANSFER', icon: Send },
   { label: 'Add to Savings', value: 'SAVINGS', icon: PiggyBank },
-] satisfies Array<ItemWithIcon>
+  { label: 'Transfer to another wallet', value: 'TRANSFER', icon: Send },
+] satisfies Array<Choice<string>>
 
 export const COLORSCHEMES = [
   {
@@ -102,3 +104,51 @@ export const COLORSCHEMES = [
     value: 'PURPLE',
   },
 ] satisfies Array<ColorScheme>
+
+export const BUDGET_METHODS = [
+  {
+    label: 'Method 1: Needs / Wants / Savings',
+    value: 'ThreeBucket',
+    icon: PieChart,
+  },
+  {
+    label: 'Method 2: Category-Based Budgeting',
+    value: 'CategoryBased',
+    icon: List,
+  },
+] satisfies Array<Choice<string>>
+
+export const RECURRING_PERIODS = [
+  { label: 'Daily', value: 'DAILY' },
+  { label: 'Weekly', value: 'WEEKLY' },
+  { label: 'Monthly', value: 'MONTHLY' },
+  { label: 'Annually', value: 'ANNUALLY' },
+] satisfies Array<Choice<string>>
+
+export const THREE_BUCKET_CATEGORIES = [7, 8, 9, 10, 12, 13, 14, 3, 6]
+export const INITIAL_BUDGETS = {
+  ThreeBucket: [
+    {
+      categories: [7, 8, 9, 10],
+      name: 'Needs',
+      percentage: 60,
+      totalAmount: 0,
+    },
+    {
+      categories: [12, 13, 14],
+      name: 'Wants',
+      percentage: 20,
+      totalAmount: 0,
+    },
+    {
+      categories: [3, 6],
+      name: 'Savings',
+      percentage: 20,
+      totalAmount: 0,
+    },
+  ],
+
+  CategoryBased: [
+    { categories: undefined, name: '', totalAmount: 0, percentage: 0 },
+  ],
+}

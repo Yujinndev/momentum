@@ -10,9 +10,8 @@ export type ColorScheme = {
   value: string
 }
 
-export type Item = {
+export type Choice<T> = {
   label: string
-  value: string
+  value: T
+  icon?: LucideIcon
 }
-
-export type ItemWithIcon = Item & { icon: LucideIcon }
