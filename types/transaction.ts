@@ -1,12 +1,11 @@
 import { z } from 'zod'
 
-export const transactionSchema = z.object({
-  id: z.string().optional(),
+export const baseTransactionSchema = z.object({
   description: z.string().min(1, { message: 'Description is required.' }),
   amount: z.coerce
     .number()
     .positive({
-      message: 'Amount must be greater than 0',
+      message: 'Amount is required.',
     })
     .finite(),
   categoryId: z.coerce
@@ -17,12 +16,32 @@ export const transactionSchema = z.object({
     .positive()
     .finite(),
   type: z.enum(['INCOME', 'EXPENSE', 'TRANSFER', 'SAVINGS']),
-  status: z.enum(['PENDING', 'COMPLETED', 'FAILED', 'CANCELLED']),
   walletId: z.string().min(1, { message: 'Wallet is required.' }),
-  financialProfileId: z.string().min(1, { message: 'Profile is required.' }),
-  budgetId: z.string().nullable(),
-  savingsGoalId: z.string().nullable(),
-  date: z.coerce.date(),
+  transactionDate: z.coerce.date(),
+  budgetId: z.string().optional().nullable(),
 })
 
+export const transactionSchema = z.discriminatedUnion('type', [
+  baseTransactionSchema.extend({
+    type: z.literal('INCOME'),
+  }),
+  baseTransactionSchema.extend({
+    type: z.literal('EXPENSE'),
+  }),
+  baseTransactionSchema.extend({
+    type: z.literal('TRANSFER'),
+    receivingWalletId: z.string().min(1, { message: 'Wallet is required.' }),
+  }),
+  baseTransactionSchema.extend({
+    type: z.literal('SAVINGS'),
+    savingsGoalId: z.string().min(1, { message: 'Savings Goal is required.' }),
+  }),
+])
+
+export type BaseTransaction = z.infer<typeof baseTransactionSchema>
 export type Transaction = z.infer<typeof transactionSchema>
+
+export type DetailedTransaction = BaseTransaction & {
+  id: string
+  walletRunningBalance: number
+}

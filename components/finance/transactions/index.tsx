@@ -1,30 +1,151 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
-import { Skeleton } from '@/components/ui/skeleton'
-import { allColumns, displayColumns } from './data-table-columns'
-import { DataTable, DataTableVariant } from './data-table'
-import { getUserTransactions } from '@/actions/finance/transaction/get-user-transactions'
+import { useState } from 'react'
+import Link from 'next/link'
+import { Plus } from 'lucide-react'
+import {
+  ColumnDef,
+  ColumnFiltersState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
+  useReactTable,
+  VisibilityState,
+} from '@tanstack/react-table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { DataTablePagination } from './pagination'
+import { DataTableViewOptions } from './view-options'
 
-export default function TransactionsTable({
-  variant = 'DISPLAY',
-}: {
-  variant?: DataTableVariant
-}) {
-  const { data: transactions } = useQuery({
-    queryKey: ['transactions'],
-    queryFn: () => getUserTransactions(),
+export interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[]
+  data: TData[]
+}
+
+export function DataTable<TData, TValue>({
+  columns,
+  data,
+}: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [globalFilter, setGlobalFilter] = useState([])
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+
+  const [rowSelection, setRowSelection] = useState({})
+
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    onGlobalFilterChange: setGlobalFilter,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+      globalFilter,
+    },
+    initialState: {
+      pagination: {
+        pageIndex: 0,
+        pageSize: 15,
+      },
+    },
   })
 
-  if (!transactions?.transactions) return <Skeleton />
-
   return (
-    <div className="container mx-auto">
-      <DataTable
-        variant={variant}
-        data={transactions?.transactions ?? []}
-        columns={variant === 'FULL' ? allColumns : displayColumns}
-      />
+    <div className="relative grid h-full w-full gap-4 overflow-x-auto px-2 py-3">
+      <div className="h-full max-h-[80%] space-y-3">
+        <div className="flex items-center">
+          <Input
+            placeholder="Filter transactions..."
+            onChange={(e) => table.setGlobalFilter(String(e.target.value))}
+            className="max-w-sm"
+          />
+
+          <div className="flex w-full items-center justify-end gap-2">
+            <DataTableViewOptions table={table} />
+            <Button variant="secondary" asChild>
+              <Link href="/finance/transaction/new">
+                <Plus /> Add
+              </Link>
+            </Button>
+          </div>
+        </div>
+
+        <div className="h-full max-w-[25rem] overflow-x-auto rounded-md border lg:max-w-full">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    )
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && 'selected'}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+      <div className="absolute inset-x-0 bottom-4 h-[10%] w-full">
+        <DataTablePagination table={table} />
+      </div>
     </div>
   )
 }
