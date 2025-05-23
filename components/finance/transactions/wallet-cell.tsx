@@ -1,24 +1,20 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { useQuery } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
 import { getColorScheme } from '@/utils/get-values-from-choices'
-import { getUserWallets } from '@/actions/finance/wallet/get-user-wallets'
+import { useUserWallets } from '@/data/queries/get-user-wallets'
 
 interface WalletCellProps {
   walletId: string
 }
 
 export function WalletCell({ walletId }: WalletCellProps) {
-  const { data: wallets, isSuccess } = useQuery({
-    queryKey: ['wallets'],
-    queryFn: () => getUserWallets(),
-  })
+  const { data: wallets, isSuccess, isLoading } = useUserWallets()
 
-  if (!isSuccess) return <Skeleton />
+  if (!isSuccess || isLoading) return <Skeleton />
 
-  const wallet = wallets?.items?.find((wallet) => wallet.id === walletId)
+  const wallet = wallets?.items?.find(({ id }) => id === walletId)
   const color = getColorScheme(wallet?.color!)
 
   return (

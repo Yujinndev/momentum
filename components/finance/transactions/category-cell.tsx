@@ -1,37 +1,37 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { useQuery } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
-import { getColorScheme } from '@/utils/get-values-from-choices'
-import { getUserCategories } from '@/actions/finance/category/get-user-categories'
+import { TRANSACTION_TYPES } from '@/constants/choices'
+import { useUserCategories } from '@/data/queries/get-user-categories'
 
 type WalletCellProps = {
   categoryId: number
+  type: string
 }
 
-export function CategoryCell({ categoryId }: WalletCellProps) {
-  const { data: categories, isSuccess } = useQuery({
-    queryKey: ['categories'],
-    queryFn: () => getUserCategories(),
-  })
+export function CategoryCell({ categoryId, type }: WalletCellProps) {
+  const { data: categories, isSuccess, isLoading } = useUserCategories()
 
-  if (!isSuccess) return <Skeleton />
+  if (!isSuccess || isLoading) return <Skeleton />
 
-  const category = categories?.items?.find(
-    (category) => category.id === categoryId
-  )
-
-  const color = getColorScheme(category?.color!)
+  const category = categories?.items?.find(({ id }) => id === categoryId)
+  const txType = TRANSACTION_TYPES.find(({ value }) => value === type)
 
   return (
     <div
       className={cn(
-        `w-28 rounded-full border bg-muted-foreground/10 px-2 py-1 text-center text-xs font-medium`,
-        color.border
+        'w-max rounded-lg p-2 lg:px-4',
+        'flex items-center justify-center gap-4',
+        'bg-zinc-100 dark:bg-zinc-800',
+        'border border-zinc-200 dark:border-zinc-700'
       )}
     >
-      {category?.name}
+      {txType && (
+        <txType.icon className="h-4 w-4 text-zinc-900 dark:text-zinc-100" />
+      )}
+
+      <small>{category?.name}</small>
     </div>
   )
 }

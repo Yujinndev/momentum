@@ -28,6 +28,9 @@ export const getUserCategories = async () => {
       success: { message: 'User categories fetched successfully' },
     }
   } catch (error) {
-    return { error: 'Failed to get user categories', details: error }
+    return {
+      items: [],
+      error: { message: 'Failed to fetch categories', details: error },
+    }
   }
 }

@@ -25,7 +25,9 @@ export const getUserWallets = async () => {
       success: { message: 'User wallets fetched successfully' },
     }
   } catch (error) {
-    console.log('Get user wallets error:', error)
-    throw error
+    return {
+      items: [],
+      error: { message: 'Failed to fetch wallets.', details: error },
+    }
   }
 }
