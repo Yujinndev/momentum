@@ -1,25 +1,94 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { Separator } from '@/components/ui/separator'
-import { SidebarTrigger } from '@/components/ui/sidebar'
-import { NAVIGATIONS } from '@/constants/navigation'
+import { useSession } from 'next-auth/react'
+import { Brand } from '@/components/brand'
+import { logout } from '@/actions/account/auth.action'
+import { Button } from '@/components/ui/button'
+import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { cn } from '@/lib/utils'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { ThemeToggle } from '../theme/toggle'
 
 const Header = () => {
   const pathname = usePathname()
-  const currentPath = NAVIGATIONS.find((menu) => pathname.startsWith(menu.url))
+  const { data: session } = useSession()
+
+  const { isMobile } = useSidebar()
 
   return (
-    <header className="flex h-20 shrink-0 items-center gap-2 border-b border-b-foreground/10 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-      <div className="flex items-center gap-2 px-4">
-        <SidebarTrigger className="-ml-1" />
-        <Separator orientation="vertical" className="mr-2 h-4" />
-        <div>
+    <header className="fixed z-30 flex h-20 w-full shrink-0 items-center gap-2 border-b bg-background transition-[width,height] ease-linear">
+      <div className="flex w-full items-center justify-between gap-2 px-6">
+        <div className="flex items-center">
+          <SidebarTrigger
+            size="lg"
+            variant="ghost"
+            className={cn('h-10 w-10 rounded-full p-2', {
+              hidden: !isMobile,
+            })}
+          />
+
+          <Brand showIcon={!isMobile} />
+        </div>
+
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+
+          {session?.user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="relative size-10 rounded-full border ring-1"
+                >
+                  <Avatar className="size-10">
+                    <AvatarImage
+                      src={session?.user?.image!}
+                      alt={session?.user?.name!}
+                    />
+                    <AvatarFallback>
+                      {session?.user?.name?.split(' ')[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {session?.user?.name}
+                    </p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {session?.user?.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <form action={logout}>
+                    <Button variant="destructive" className="w-full text-left">
+                      Logout
+                    </Button>
+                  </form>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+        {/* <div>
           <h1 className="text-xl">{currentPath?.name}</h1>
           <p className="text-sm text-muted-foreground">
             {currentPath?.description}
           </p>
-        </div>
+        </div> */}
       </div>
     </header>
   )

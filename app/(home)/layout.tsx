@@ -1,22 +1,20 @@
 import Header from '@/components/layout/header'
 import { AppSidebar } from '@/components/layout/sidebar'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
-import { validateAccountCreationStatus } from '@/actions/account/validate-account-creation'
 
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  await validateAccountCreationStatus()
-
   return (
-    <section className="overflow-x-hidden">
+    <section className="relative flex overflow-x-hidden">
       <SidebarProvider>
-        <AppSidebar />
+        <Header />
+        <AppSidebar className="top-20" />
+
         <SidebarInset>
-          <Header />
-          <main>{children}</main>
+          <main className="px-2 pt-[6.5rem] lg:px-14">{children}</main>
         </SidebarInset>
       </SidebarProvider>
     </section>

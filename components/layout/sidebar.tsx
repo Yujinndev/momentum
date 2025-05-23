@@ -4,15 +4,14 @@ import * as React from 'react'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
-import { logout } from '@/actions/account/auth.action'
 import { LogOut, Settings } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { Brand } from '@/components/brand'
-import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
+import { logout } from '@/actions/account/auth.action'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { NAVIGATIONS } from '@/constants/navigation'
-import { ThemeToggle } from '@/components/theme/toggle'
+import { Calendar } from '@/components/ui/calendar'
+import { Button } from '@/components/ui/button'
+import { Brand } from '@/components/brand'
+import { cn } from '@/lib/utils'
 import {
   Sidebar,
   SidebarContent,
@@ -24,52 +23,64 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
+  useSidebar,
 } from '@/components/ui/sidebar'
+import Header from './header'
+import { format } from 'date-fns'
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: session } = useSession()
+export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
+  const { data: session } = useSession()
+  const { isMobile } = useSidebar()
 
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
-        <Brand>
-          <ThemeToggle />
-        </Brand>
-      </SidebarHeader>
+    <Sidebar
+      collapsible="offcanvas"
+      {...props}
+      className={cn('border-r', props.className)}
+    >
+      <SidebarTrigger
+        size="lg"
+        variant="outline"
+        className={cn('absolute -right-5 top-4 h-10 w-10 rounded-full p-2', {
+          hidden: isMobile,
+        })}
+      />
 
-      <SidebarGroup className="px-0">
-        <SidebarGroupContent>
-          <Calendar className="[&_[role=gridcell].bg-accent]:bg-sidebar-primary [&_[role=gridcell].bg-accent]:text-sidebar-primary-foreground [&_[role=gridcell]]:w-[35px]" />
-        </SidebarGroupContent>
-      </SidebarGroup>
+      <SidebarContent className="px-3 py-6 pr-4 lg:px-1 lg:py-1 lg:pr-4">
+        <div className="relative mx-2 rounded-md border border-white/20 bg-muted-foreground/60 py-4">
+          <p className="text-center font-bold">
+            {format(new Date(), 'EEEE, LLL do')}
+          </p>
+        </div>
 
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+        {NAVIGATIONS.map((nav) => (
+          <SidebarGroup key={nav.label}>
+            <SidebarGroupLabel>{nav.label}</SidebarGroupLabel>
 
-          <SidebarMenu>
-            {NAVIGATIONS.filter((nav) => nav.isVisible).map((item) => (
-              <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton
-                  tooltip={item.name}
-                  className={cn('hover:bg-accent', {
-                    'bg-primary text-white hover:bg-primary/80 hover:text-gray-100':
-                      pathname.startsWith(item.url),
-                  })}
-                  asChild
-                >
-                  <Link href={item.url}>
-                    {item.icon && <item.icon />}
-                    <span>{item.name}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroup>
+            <SidebarMenu>
+              {nav.items.map((item) => (
+                <SidebarMenuItem key={item.url}>
+                  <SidebarMenuButton
+                    tooltip={item.name}
+                    className={cn('h-10 px-4 hover:bg-accent', {
+                      'bg-muted': pathname.startsWith(item.url),
+                    })}
+                    asChild
+                  >
+                    <Link href={item.url}>
+                      <item.icon className="!h-5 !w-5" />
+                      <span>{item.name}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
-
+      {/*
       <SidebarFooter>
         <SidebarGroup className="space-y-1">
           <SidebarGroupLabel>Settings</SidebarGroupLabel>
@@ -110,7 +121,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </div>
           )}
         </SidebarGroup>
-      </SidebarFooter>
+      </SidebarFooter> */}
     </Sidebar>
   )
 }

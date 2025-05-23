@@ -4,13 +4,16 @@ export const SectionLayout = ({
   children,
   className,
 }: {
-  children: React.ReactNode
+  children?: React.ReactNode
   className?: string
 }) => {
   return (
     <section
       className={cn(
-        'relative mx-auto max-w-screen-2xl px-4 py-8 pr-6',
+        'relative mx-auto h-full w-full max-w-screen-2xl p-6',
+        'bg-white dark:bg-zinc-900/70',
+        'border border-zinc-100 dark:border-zinc-800',
+        'rounded-xl shadow-sm backdrop-blur-xl',
         className
       )}
     >
