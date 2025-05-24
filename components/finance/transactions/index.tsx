@@ -27,15 +27,18 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { DataTablePagination } from './pagination'
 import { DataTableViewOptions } from './view-options'
+import { cn } from '@/lib/utils'
 
 export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  className?: string
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  className = '',
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -72,18 +75,23 @@ export function DataTable<TData, TValue>({
   })
 
   return (
-    <div className="relative grid h-full w-full gap-4 overflow-x-auto px-2 py-3">
-      <div className="h-full max-h-[80%] space-y-3">
-        <div className="flex items-center">
+    <div
+      className={cn(
+        'relative grid h-full w-full gap-4 overflow-x-auto',
+        className
+      )}
+    >
+      <div className="h-full max-h-[80%] w-full space-y-3">
+        <div className="flex flex-col items-center gap-2 md:flex-row">
           <Input
             placeholder="Filter transactions..."
             onChange={(e) => table.setGlobalFilter(String(e.target.value))}
-            className="max-w-sm"
+            className="w-full lg:max-w-sm"
           />
 
           <div className="flex w-full items-center justify-end gap-2">
             <DataTableViewOptions table={table} />
-            <Button variant="secondary" asChild>
+            <Button variant="secondary" className="w-full" asChild>
               <Link href="/finance/transaction/new">
                 <Plus /> Add
               </Link>
@@ -91,7 +99,7 @@ export function DataTable<TData, TValue>({
           </div>
         </div>
 
-        <div className="h-full max-w-[25rem] overflow-x-auto rounded-md border lg:max-w-full">
+        <div className="h-full max-w-[17.5rem] overflow-x-auto rounded-md border sm:max-w-full">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -143,7 +151,7 @@ export function DataTable<TData, TValue>({
         </div>
       </div>
 
-      <div className="absolute inset-x-0 bottom-4 h-[10%] w-full">
+      <div className="h-[10%] w-full lg:absolute lg:inset-x-0 lg:bottom-4">
         <DataTablePagination table={table} />
       </div>
     </div>

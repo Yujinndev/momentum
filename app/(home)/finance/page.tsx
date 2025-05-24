@@ -1,12 +1,27 @@
-import { TransactionsTable } from '@/components/finance/transactions'
+import { Budgets } from '@/components/finance/budget-list'
+import { DataTable } from '@/components/finance/transactions'
 import { SectionLayout } from '@/components/layout/section-layout'
+import { transaction } from '@/components/finance/transactions/columns'
+import { getUserBudgets } from '@/actions/finance/budget/get-user-budgets'
+import { getUserTransactions } from '@/actions/finance/transaction/get-user-transactions'
 
-export default function Finance() {
+export default async function Page() {
+  const [budgets, transactions] = await Promise.all([
+    getUserBudgets(),
+    getUserTransactions(),
+  ])
+
   return (
-    <SectionLayout>
-      <div className="space-y-8">
-        <TransactionsTable variant="FULL" />
-      </div>
-    </SectionLayout>
+    <div className="relative grid h-full w-full gap-4 lg:grid-cols-4">
+      <Budgets items={budgets.items} className="sticky top-0 h-max" />
+
+      <SectionLayout className="px-3 py-3 lg:col-span-3">
+        <DataTable
+          data={transactions?.items}
+          columns={transaction}
+          className="min-h-[105vh]"
+        />
+      </SectionLayout>
+    </div>
   )
 }

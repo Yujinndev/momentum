@@ -44,6 +44,7 @@ export const transaction: ColumnDef<DetailedTransaction>[] = [
 
   {
     accessorKey: 'categoryId',
+    enableSorting: false,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Category" />
     ),
@@ -80,6 +81,7 @@ export const transaction: ColumnDef<DetailedTransaction>[] = [
     ),
     cell: ({ row }) => {
       const walletId: string = row.getValue('walletId')
+
       return (
         <div className="flex w-full items-center justify-center">
           <WalletCell walletId={walletId} />
