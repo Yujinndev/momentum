@@ -75,3 +75,20 @@ export const budgetSettingSchema = z.discriminatedUnion('method', [
 ])
 
 export type BudgetSetting = z.infer<typeof budgetSettingSchema>
+
+export type DetailedBudget = {
+  id: string
+  userId: string
+  name: string
+  spent: number
+  totalAmount: number
+  percentage: number | null
+  createdAt: Date | null
+  updatedAt: Date | null
+  deletedAt: Date | null
+  startDate: Date
+  endDate: Date
+  isRecurring: boolean
+  trackBy: 'ALL' | 'CATEGORY'
+  recurringPeriod: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'ANNUALLY' | null
+}
