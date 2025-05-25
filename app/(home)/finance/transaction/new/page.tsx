@@ -1,29 +1,17 @@
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from '@tanstack/react-query'
-import { getUserWallets } from '@/actions/finance/wallet/get-wallets'
+import { getUserWallets } from '@/actions/finance/wallet/get-user-wallets'
 import { getUserCategories } from '@/actions/finance/category/get-user-categories'
 import { AddTransactionForm } from '@/components/finance/transactions/add-form'
 
 export default async function NewTransaction() {
-  const queryClient = new QueryClient()
-
-  await Promise.all([
-    queryClient.prefetchQuery({
-      queryKey: ['categories'],
-      queryFn: getUserCategories,
-    }),
-    queryClient.prefetchQuery({
-      queryKey: ['wallets'],
-      queryFn: getUserWallets,
-    }),
+  const [wallets, categories] = await Promise.all([
+    getUserWallets(),
+    getUserCategories(),
   ])
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <AddTransactionForm />
-    </HydrationBoundary>
+    <AddTransactionForm
+      wallets={wallets.items}
+      categories={categories?.items}
+    />
   )
 }

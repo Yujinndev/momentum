@@ -29,6 +29,7 @@ import { WalletCard } from '@/components/finance/wallet-card'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { COLORSCHEMES, WALLET_TYPES } from '@/constants/choices'
 import { useWalletMutation } from '@/data/mutations/wallet-mutation'
+import { OptionSelect } from '@/components/ui/option-select'
 
 type AddWalletFormProps = {
   wallet?: Wallet
@@ -103,20 +104,23 @@ export const WalletForm = ({
                       <FormLabel>Color</FormLabel>
                       <FormControl>
                         <div className="flex w-full flex-wrap justify-between">
-                          {COLORSCHEMES.map((color) => (
-                            <div
-                              key={color.value}
-                              className={cn(
-                                `h-8 w-8 cursor-pointer rounded-full`,
-                                color.primary,
-                                {
-                                  'ring-2 ring-black ring-offset-2':
-                                    field.value === color.value,
-                                }
-                              )}
-                              onClick={() => field.onChange(color.value)}
-                            />
-                          ))}
+                          {COLORSCHEMES.map(({ value, primary }) => {
+                            const isSelected = field.value === value
+
+                            return (
+                              <button
+                                type="button"
+                                key={value}
+                                onClick={() => field.onChange(value)}
+                                className={cn(
+                                  'h-8 w-8 cursor-pointer rounded-full',
+                                  'ring-1 ring-muted-foreground',
+                                  { 'ring-2 ring-offset-2': isSelected },
+                                  primary
+                                )}
+                              />
+                            )
+                          })}
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -140,6 +144,7 @@ export const WalletForm = ({
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="description"
@@ -157,6 +162,7 @@ export const WalletForm = ({
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="balance"
@@ -251,7 +257,11 @@ export const WalletForm = ({
                   </Button>
                 )}
 
-                <Button type="submit" className="w-full" disabled={isPending}>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isPending || !form.formState.isDirty}
+                >
                   {form.formState.isSubmitting
                     ? FORM_DETAIL.cta.pending
                     : FORM_DETAIL.cta.default}

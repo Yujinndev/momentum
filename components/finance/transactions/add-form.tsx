@@ -1,27 +1,26 @@
 'use client'
 
+import { useEffect, useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { MoveLeft } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { useQueries } from '@tanstack/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Transaction, transactionSchema } from '@/types/transaction'
-import { getUserWallets } from '@/actions/finance/wallet/get-user-wallets'
-import { getUserCategories } from '@/actions/finance/category/get-user-categories'
 import { createTransaction } from '@/actions/finance/transaction/create-transaction'
-import { getWalletType, getColorScheme } from '@/utils/get-values-from-choices'
-import { validateNumber } from '@/utils/validate-number'
+import {
+  getWalletType,
+  getColorScheme,
+  getWalletById,
+} from '@/utils/get-values-from-choices'
 import { TRANSACTION_TYPES } from '@/constants/choices'
 import { FORM_DETAILS } from '@/constants/config'
-
 import { useToast } from '@/hooks/use-toast'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { WalletCard } from '@/components/finance/wallet/card'
+import { WalletCard } from '@/components/finance/wallet-card'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { DatetimePicker } from '@/components/ui/date-time-picker'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import {
   Form,
   FormControl,
@@ -37,43 +36,57 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { SectionLayout } from '@/components/layout/section-layout'
+import { OptionSelect } from '@/components/ui/option-select'
+import { WalletWithId } from '@/types/wallet'
+import { Category } from '@prisma/client'
 
-export default function AddTransactionForm() {
+type AddTransactionFormProps = {
+  wallets: WalletWithId[]
+  categories: Category[]
+}
+
+export function AddTransactionForm({
+  wallets,
+  categories,
+}: AddTransactionFormProps) {
   const router = useRouter()
   const { toast } = useToast()
 
-  const [{ data: wallets, isSuccess: isWalletsFetched }, { data: categories }] =
-    useQueries({
-      queries: [
-        { queryKey: ['wallets'], queryFn: () => getUserWallets() },
-        { queryKey: ['categories'], queryFn: () => getUserCategories() },
-      ],
-    })
-
-  if (isWalletsFetched && !wallets?.items) {
-    router.push('/dashboard')
-  }
-
-  const defaultWallet = wallets?.items?.find((item) => item.isDefault)?.id
+  const defaultWallet = wallets.find((item) => item.isDefault)
   const form = useForm<Transaction>({
+    shouldUnregister: true,
     resolver: zodResolver(transactionSchema),
     defaultValues: {
       description: '',
       categoryId: undefined,
       amount: 0.0,
       type: 'EXPENSE',
-      status: 'COMPLETED',
-      walletId: defaultWallet,
-      financialProfileId: wallets?.financialProfileId,
-      budgetId: null,
-      savingsGoalId: null,
-      date: new Date(),
+      walletId: defaultWallet?.id,
+      transactionDate: new Date(),
+      budgetId: undefined,
     },
   })
 
-  const currentWallet = wallets?.items?.find(
-    (wallet) => wallet.id === form.watch().walletId
+  const currentWallet = useMemo(
+    () => wallets && getWalletById(wallets, form.watch('walletId')),
+    [form.watch('walletId')]
   )
+
+  const receivingWallet = useMemo(
+    () => getWalletById(wallets, form.watch('receivingWalletId')),
+    [form.watch('receivingWalletId')]
+  )
+
+  useEffect(() => {
+    const isSenderAndReceiverTheSame =
+      form.watch('receivingWalletId') &&
+      form.watch('receivingWalletId') === form.watch('walletId')
+
+    if (isSenderAndReceiverTheSame) {
+      form.resetField('receivingWalletId', { keepDirty: true })
+    }
+  }, [form.watch('walletId'), form.watch('receivingWalletId')])
 
   const onSubmit = async (values: Transaction) => {
     if (!currentWallet) {
@@ -89,25 +102,28 @@ export default function AddTransactionForm() {
     }
 
     const response = await createTransaction({ values })
+
     if (response.error) {
-      return form.setError('root', {
-        message: response.error,
+      return toast({
+        title: response.error.message,
+        description: 'Please try again',
       })
     }
 
     toast({
-      title: response.success?.message,
+      title: response.success.message,
       description: 'You can record your transactions again.',
     })
 
     form.reset()
+    router.refresh()
   }
 
-  const FORM_DETAIL = FORM_DETAILS.transaction.create
+  const { title, description, cta } = FORM_DETAILS.transaction.create
 
   return (
-    <div className="m-auto space-y-8 rounded-md px-8 py-6 md:w-2/3 lg:w-4/5">
-      <div className="flex items-center gap-4 rounded-xl border bg-muted/50 px-6 py-3 pb-5">
+    <div className="m-auto space-y-8 rounded-md">
+      <SectionLayout className="flex items-center gap-4">
         <Button
           variant="ghost"
           className="h-8 w-8 rounded-full"
@@ -115,199 +131,240 @@ export default function AddTransactionForm() {
         >
           <MoveLeft />
         </Button>
+
         <div className="py-2">
-          <h2 className="text-lg font-bold">{FORM_DETAIL.title}</h2>
-          <p className="text-sm">{FORM_DETAIL.description}</p>
+          <h2 className="text-lg font-bold">{title}</h2>
+          <p className="text-sm">{description}</p>
         </div>
-      </div>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div className="grid w-full gap-x-6 gap-y-4 lg:grid-cols-5">
-            <div className="space-y-4 lg:col-span-2">
-              {form.watch('walletId') && currentWallet && (
-                <WalletCard wallet={currentWallet} />
-              )}
+      </SectionLayout>
 
-              <FormField
-                control={form.control}
-                name="walletId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Wallet</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+      <SectionLayout>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <div className="grid w-full gap-x-6 gap-y-4 lg:grid-cols-5">
+              <div className="space-y-4 lg:col-span-2">
+                {form.watch('walletId') && currentWallet && (
+                  <WalletCard wallet={currentWallet} />
+                )}
+
+                <FormField
+                  control={form.control}
+                  name="walletId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>From Wallet</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a wallet" />
-                        </SelectTrigger>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a wallet" />
+                          </SelectTrigger>
+
+                          <SelectContent>
+                            {wallets.map((wallet) => {
+                              const type = getWalletType(wallet?.type)
+                              const color = getColorScheme(wallet?.color)
+
+                              return (
+                                <SelectItem key={wallet.id} value={wallet.id}>
+                                  <div
+                                    className={cn(
+                                      `flex items-center gap-4 text-${color.base}-400`
+                                    )}
+                                  >
+                                    <type.icon size={20} /> —{' '}
+                                    <span>{wallet.name}</span>
+                                  </div>
+                                </SelectItem>
+                              )
+                            })}
+                          </SelectContent>
+                        </Select>
                       </FormControl>
-                      <SelectContent>
-                        {wallets?.items?.map((wallet) => {
-                          const type = getWalletType(wallet?.type)
-                          const color = getColorScheme(wallet?.color)
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                          return (
-                            <SelectItem key={wallet.id} value={wallet.id}>
-                              <div
-                                className={cn(
-                                  `flex items-center gap-4 text-${color.base}-500`
-                                )}
-                              >
-                                <type.icon size={20} /> —{' '}
-                                <span>{wallet.name}</span>
-                              </div>
-                            </SelectItem>
-                          )
-                        })}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
+                {form.watch('type') === 'TRANSFER' && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="receivingWalletId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Receiving Wallet</FormLabel>
+                          <FormControl>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select a recieving wallet" />
+                              </SelectTrigger>
+
+                              <SelectContent>
+                                {wallets
+                                  .filter(
+                                    (item) => item.id !== form.watch('walletId')
+                                  )
+                                  .map((wallet) => {
+                                    const type = getWalletType(wallet?.type)
+                                    const color = getColorScheme(wallet?.color)
+
+                                    return (
+                                      <SelectItem
+                                        key={wallet.id}
+                                        value={wallet.id}
+                                      >
+                                        <div
+                                          className={cn(
+                                            `flex items-center gap-4 text-${color.base}-400`
+                                          )}
+                                        >
+                                          <type.icon size={20} /> —{' '}
+                                          <span>{wallet.name}</span>
+                                        </div>
+                                      </SelectItem>
+                                    )
+                                  })}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {form.watch('receivingWalletId') && receivingWallet && (
+                      <WalletCard wallet={receivingWallet} />
+                    )}
+                  </>
                 )}
-              />
-            </div>
+              </div>
 
-            <div className="space-y-4 lg:col-span-3">
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Buy Foods" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="categoryId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Category</FormLabel>
-                    <Select onValueChange={field.onChange}>
+              <div className="space-y-4 lg:col-span-3">
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
+                        <Input placeholder="Buy Foods" {...field} />
                       </FormControl>
-                      <SelectContent>
-                        {categories?.items?.map((category) => {
-                          const color = getColorScheme(category.color)
-                          const id = category.id.toString()
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                          return (
-                            <SelectItem key={id} value={id}>
-                              <div className={`text-${color.base}-500`}>
-                                {category.name}
-                              </div>
-                            </SelectItem>
-                          )
-                        })}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
+                <FormField
+                  control={form.control}
+                  name="categoryId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category</FormLabel>
+                      <FormControl>
+                        <Select onValueChange={field.onChange}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+
+                          <SelectContent>
+                            {categories?.map((category) => {
+                              const color = getColorScheme(category.color)
+                              const id = category.id.toString()
+
+                              return (
+                                <SelectItem key={id} value={id}>
+                                  <div className={`text-${color.base}-400`}>
+                                    {category.name}
+                                  </div>
+                                </SelectItem>
+                              )
+                            })}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3 rounded border bg-muted/50 px-4 py-2 pb-4">
+                      <FormLabel>Type of Transaction</FormLabel>
+                      <FormControl>
+                        <OptionSelect
+                          variant="single"
+                          selected={field.value}
+                          onSelectionChange={field.onChange}
+                          choices={TRANSACTION_TYPES}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Amount</FormLabel>
+                      <FormControl>
+                        <CurrencyInput {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="transactionDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Date of Transaction</FormLabel>
+                      <FormControl>
+                        <DatetimePicker
+                          className="w-full"
+                          {...field}
+                          format={[
+                            ['months', 'days', 'years'],
+                            ['hours', 'minutes', 'am/pm'],
+                          ]}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {form.formState.errors.root && (
+                  <div className="text-red-500">
+                    {form.formState.errors.root.message}
+                  </div>
                 )}
-              />
 
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem className="space-y-3 rounded border bg-muted/50 px-4 py-2 pb-4">
-                    <FormLabel>Type of Transaction</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex flex-col space-y-1"
-                      >
-                        {TRANSACTION_TYPES.map((type) => (
-                          <FormItem
-                            key={type.value}
-                            className="flex items-center space-x-3 space-y-0"
-                          >
-                            <FormControl>
-                              <RadioGroupItem value={type.value} />
-                            </FormControl>
-                            <FormLabel className="flex items-center gap-3 font-normal">
-                              <type.icon /> {type.label}
-                            </FormLabel>
-                          </FormItem>
-                        ))}
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Amount</FormLabel>
-                    <FormControl>
-                      <CurrencyInput
-                        type="number"
-                        {...field}
-                        onChange={(e) => {
-                          const value = validateNumber(e.target.value)
-                          field.onChange(value)
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Date of Transaction</FormLabel>
-                    <FormControl>
-                      <DatetimePicker
-                        className="w-full"
-                        {...field}
-                        format={[
-                          ['months', 'days', 'years'],
-                          ['hours', 'minutes', 'am/pm'],
-                        ]}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {form.formState.errors.root && (
-                <div className="text-red-500">
-                  {form.formState.errors.root.message}
-                </div>
-              )}
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={form.formState.isSubmitting}
-              >
-                {form.formState.isSubmitting
-                  ? FORM_DETAIL.cta.pending
-                  : FORM_DETAIL.cta.default}
-              </Button>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  isLoading={form.formState.isSubmitting}
+                >
+                  {form.formState.isSubmitting ? cta.pending : cta.default}
+                </Button>
+              </div>
             </div>
-          </div>
-        </form>
-      </Form>
+          </form>
+        </Form>
+      </SectionLayout>
     </div>
   )
 }
