@@ -11,8 +11,8 @@ import {
   PhilippinePeso,
   PieChart,
   PiggyBank,
-  ReceiptText,
   Send,
+  ShoppingCart,
   Wallet,
 } from 'lucide-react'
 
@@ -33,8 +33,8 @@ export const WALLET_TYPES = [
 ] satisfies Array<Choice<string>>
 
 export const TRANSACTION_TYPES = [
-  { label: 'Expense', value: 'EXPENSE', icon: ReceiptText },
-  { label: 'Income', value: 'INCOME', icon: Banknote },
+  { label: 'Expense', value: 'EXPENSE', icon: ShoppingCart },
+  { label: 'Income', value: 'INCOME', icon: Wallet },
   { label: 'Add to Savings', value: 'SAVINGS', icon: PiggyBank },
   { label: 'Transfer to another wallet', value: 'TRANSFER', icon: Send },
 ] satisfies Array<Choice<string>>
