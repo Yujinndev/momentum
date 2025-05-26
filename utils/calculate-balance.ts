@@ -1,19 +1,29 @@
+import { Transaction } from '@/types/transaction'
 import { Decimal } from '@prisma/client/runtime/library'
-
-type OperationArgs = {
-  txType: 'ADD' | 'DEDUCT'
-  txAmount: number | Decimal
-  currentBalance: number | Decimal
-}
 
 export const calculateBalance = ({
   txType,
   txAmount,
   currentBalance,
-}: OperationArgs) => {
-  if (txType === 'ADD') {
-    return Number(currentBalance) + Number(txAmount)
+  isSender = false,
+}: {
+  txType: Transaction['type']
+  txAmount: number
+  currentBalance: number | Decimal
+  isSender?: boolean
+}) => {
+  const amount = Number(txAmount)
+  const currenWalletBalance = Number(currentBalance)
+
+  if (txType === 'TRANSFER') {
+    return isSender
+      ? currenWalletBalance - amount
+      : currenWalletBalance + amount
   }
 
-  return Number(currentBalance) - Number(txAmount)
+  if (txType === 'INCOME') {
+    return currenWalletBalance + amount
+  }
+
+  return currenWalletBalance - amount
 }
