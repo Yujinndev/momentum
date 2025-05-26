@@ -12,12 +12,15 @@ export default async function Page() {
   ])
 
   return (
-    <div className="relative grid h-full w-full gap-4 lg:grid-cols-4">
-      <Budgets items={budgets.items} className="sticky top-0 h-max" />
+    <div className="relative grid h-full w-full grid-cols-1 gap-4 xl:grid-cols-4">
+      <Budgets
+        items={budgets.items}
+        className="sticky top-0 h-max self-start"
+      />
 
-      <SectionLayout className="px-3 py-3 lg:col-span-3">
+      <SectionLayout className="px-3 py-3 xl:col-span-3">
         <DataTable
-          data={transactions?.items}
+          data={transactions?.items ?? []}
           columns={transaction}
           className="min-h-[105vh]"
         />

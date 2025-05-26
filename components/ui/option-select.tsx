@@ -94,6 +94,7 @@ export const OptionSelect = React.memo(<T,>(props: OptionSelectProps<T>) => {
             key={index}
             choice={choice}
             isSelected={isSelected}
+            hasAnimation={variant !== 'single'}
             onClick={() => {
               if (variant === 'single' && isSelected) return
 
@@ -113,14 +114,16 @@ type SelectButtonProps<T> = {
   onClick: () => void
   disabled?: boolean
   className?: string
+  hasAnimation?: boolean
 }
 
 const SelectButton = <T,>({
   choice,
   isSelected,
   onClick,
-  disabled = false,
   className,
+  disabled = false,
+  hasAnimation = true,
 }: SelectButtonProps<T>) => {
   return (
     <motion.button
@@ -150,8 +153,8 @@ const SelectButton = <T,>({
       <motion.div
         className="relative flex w-full items-center justify-between"
         animate={{
-          width: isSelected ? 'auto' : '100%',
-          paddingRight: isSelected ? '1.5rem' : '0',
+          width: isSelected && hasAnimation ? 'auto' : '100%',
+          paddingRight: isSelected && hasAnimation ? '1.5rem' : '0',
         }}
         transition={{
           ease: [0.175, 0.885, 0.32, 1.275],

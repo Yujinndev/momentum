@@ -1,25 +1,22 @@
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Goal } from 'lucide-react'
-import { ThemeToggle } from '@/components/theme/toggle'
 
-export const Brand = ({
-  className,
-  showThemeToggle = false,
-}: {
+type BrandProps = {
   className?: string
-  showThemeToggle?: boolean
-}) => {
-  return (
-    <div
-      className={cn('flex w-full border-b border-white/10 p-2 pb-4', className)}
-    >
-      <Link href="/" className="flex w-full items-center gap-2 font-bold">
-        <Goal className="size-6" />
-        Momentum.
-      </Link>
+  showIcon?: boolean
+}
 
-      {showThemeToggle && <ThemeToggle />}
+export const Brand = ({ className, showIcon = true }: BrandProps) => {
+  return (
+    <div className={cn('flex w-full', className)}>
+      <Link
+        href="/"
+        className="flex w-full items-center justify-center gap-4 font-bold"
+      >
+        {showIcon && <Goal className="size-5" />}
+        momentum.
+      </Link>
     </div>
   )
 }

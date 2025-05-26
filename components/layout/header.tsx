@@ -1,13 +1,13 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
+import { cn } from '@/lib/utils'
 import { useSession } from 'next-auth/react'
 import { Brand } from '@/components/brand'
-import { logout } from '@/actions/account/auth.action'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/theme/toggle'
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { cn } from '@/lib/utils'
+import { logout } from '@/actions/account/auth.action'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,13 +16,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { ThemeToggle } from '../theme/toggle'
 
 const Header = () => {
-  const pathname = usePathname()
-  const { data: session } = useSession()
-
   const { isMobile } = useSidebar()
+  const { data: session } = useSession()
 
   return (
     <header className="fixed z-30 flex h-20 w-full shrink-0 items-center gap-2 border-b bg-background transition-[width,height] ease-linear">
@@ -83,12 +80,6 @@ const Header = () => {
             </DropdownMenu>
           )}
         </div>
-        {/* <div>
-          <h1 className="text-xl">{currentPath?.name}</h1>
-          <p className="text-sm text-muted-foreground">
-            {currentPath?.description}
-          </p>
-        </div> */}
       </div>
     </header>
   )

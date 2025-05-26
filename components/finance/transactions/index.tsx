@@ -77,19 +77,19 @@ export function DataTable<TData, TValue>({
   return (
     <div
       className={cn(
-        'relative grid h-full w-full gap-4 overflow-x-auto',
+        'relative grid h-full w-full gap-4 overflow-x-auto md:p-2',
         className
       )}
     >
       <div className="h-full max-h-[80%] w-full space-y-3">
-        <div className="flex flex-col items-center gap-2 md:flex-row">
+        <div className="flex flex-col items-center gap-2 md:flex-row md:justify-between">
           <Input
             placeholder="Filter transactions..."
             onChange={(e) => table.setGlobalFilter(String(e.target.value))}
-            className="w-full lg:max-w-sm"
+            className="w-full lg:max-w-md"
           />
 
-          <div className="flex w-full items-center justify-end gap-2">
+          <div className="flex w-full items-center justify-end gap-2 md:max-w-md">
             <DataTableViewOptions table={table} />
             <Button variant="secondary" className="w-full" asChild>
               <Link href="/finance/transaction/new">

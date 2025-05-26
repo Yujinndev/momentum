@@ -14,7 +14,7 @@ export default function DashboardLayout({
         <AppSidebar className="top-20" />
 
         <SidebarInset>
-          <main className="px-2 pt-[6.5rem] lg:px-14">{children}</main>
+          <main className="px-2 pb-8 pt-[6.5rem] md:px-14">{children}</main>
         </SidebarInset>
       </SidebarProvider>
     </section>
