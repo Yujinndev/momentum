@@ -11,23 +11,25 @@ export const getUserTransactions = async () => {
       throw new Error('No user found')
     }
 
-    const transactions = await prisma.transaction.findMany({
+    const response = await prisma.transaction.findMany({
       where: { userId: user.id },
       orderBy: { transactionDate: 'desc' },
     })
 
-    const allTransactions = transactions.map((transaction) => ({
+    const transactions = response.map((transaction) => ({
       ...transaction,
       amount: Number(transaction.amount),
       walletRunningBalance: Number(transaction.walletRunningBalance),
     }))
 
     return {
-      transactions: allTransactions,
+      items: transactions,
       success: { message: 'User transactions fetched successfully' },
     }
   } catch (error) {
-    console.log('Get user transactions error:', error)
-    throw error
+    return {
+      items: [],
+      error: { message: 'Failed to fetch transactions', details: error },
+    }
   }
 }

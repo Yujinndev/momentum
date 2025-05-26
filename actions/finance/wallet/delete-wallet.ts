@@ -16,9 +16,7 @@ export const deleteWallet = async ({ id }: DeleteWalletArgs) => {
     }
 
     const wallet = await prisma.wallet.findFirstOrThrow({
-      where: {
-        AND: [{ userId: user.id }, { id: id }],
-      },
+      where: { id, userId: user.id },
     })
 
     if (!wallet) {

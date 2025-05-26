@@ -11,11 +11,11 @@ export const getUserWallets = async () => {
       throw new Error('No user found')
     }
 
-    const userWallets = await prisma.wallet.findMany({
+    const response = await prisma.wallet.findMany({
       where: { AND: [{ userId: user.id }, { deletedAt: null }] },
     })
 
-    const wallets = userWallets?.map((wallet) => ({
+    const wallets = response.map((wallet) => ({
       ...wallet,
       balance: Number(wallet.balance),
     }))

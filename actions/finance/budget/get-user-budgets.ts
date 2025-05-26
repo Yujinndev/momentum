@@ -23,7 +23,7 @@ export const getUserBudgets = async () => {
     }))
 
     return {
-      items: budgets,
+      items: budgets.slice().sort((a, b) => b.totalAmount - a.totalAmount),
       success: { message: 'User budgets fetched successfully' },
     }
   } catch (error) {
