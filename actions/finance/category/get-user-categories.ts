@@ -21,7 +21,13 @@ export const getUserCategories = async () => {
       where: { userId: user.id },
     })
 
-    const categories = [...defaultCategories, ...userCategories]
+    const categories = [...defaultCategories, ...userCategories].map(
+      (category) => ({
+        ...category,
+        label: category.name,
+        value: category.id,
+      })
+    )
 
     return {
       items: categories,

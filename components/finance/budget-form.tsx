@@ -1,24 +1,25 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
-import { useCallback, useMemo, useState } from 'react'
+import { MoveLeft } from 'lucide-react'
+import { toast } from '@/hooks/use-toast'
+import { useRouter } from 'next/navigation'
+import { useCallback, useMemo } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm, useFormContext } from 'react-hook-form'
+import { useBudgetForm } from '@/contexts/budget-form-context'
 import { createBudget } from '@/actions/finance/budget/create-budget'
 import { completeUserOnboarding } from '@/actions/account/complete-onboarding'
-import { useUserCategories } from '@/data/queries/get-user-categories'
-import { BudgetSetting, budgetSettingSchema } from '@/types/budget'
 import { CategoryBasedFields } from '@/components/finance/category-based-fields'
 import { ThreeBucketFields } from '@/components/finance/three-buckets-fields'
-import { toast } from '@/hooks/use-toast'
-import { Choice } from '@/types/choices'
+import { BudgetSetting, budgetSettingSchema } from '@/types/budget'
+import { SectionLayout } from '@/components/layout/section-layout'
+import { CurrencyInput } from '@/components/ui/currency-input'
+import { OptionSelect } from '@/components/ui/option-select'
+import { Button } from '@/components/ui/button'
 import {
   isCategoryBasedBudget,
   isThreeBucketBudget,
 } from '@/utils/budget-helpers'
-import { Button } from '@/components/ui/button'
-import { SectionLayout } from '@/components/layout/section-layout'
-import { CurrencyInput } from '@/components/ui/currency-input'
-import { OptionSelect } from '@/components/ui/option-select'
 import {
   Form,
   FormControl,
@@ -33,73 +34,60 @@ import {
   RECURRING_PERIODS,
   THREE_BUCKET_CATEGORIES,
 } from '@/constants/choices'
+import { Budget } from '@prisma/client'
+import { cn } from '@/lib/utils'
 
 type BudgetSettingFormProps = {
-  onSubmitCallback: () => void
+  onSubmitCallback?: () => void
 }
 
 export const BudgetSettingForm = ({
   onSubmitCallback,
 }: BudgetSettingFormProps) => {
-  const { data } = useUserCategories()
-
-  const categories = useMemo(() => {
-    return data?.items?.map((category) => ({
-      label: category.name,
-      value: category.id,
-    }))
-  }, [data?.items])
-
-  const [selectedCategories, setSelectedCategories] = useState<
-    Choice<number>['value'][]
-  >(THREE_BUCKET_CATEGORIES)
+  const router = useRouter()
 
   const form = useForm<BudgetSetting>({
     resolver: zodResolver(budgetSettingSchema),
-    shouldUnregister: true,
     mode: 'onChange',
     reValidateMode: 'onChange',
     defaultValues: {
       totalAmount: 0,
       method: 'ThreeBucket',
-      recurringPeriod: 'MONTHLY',
       buckets: INITIAL_BUDGETS['ThreeBucket'],
     },
   })
-  const { control, setValue, watch, reset, getValues } = form
+  const { control, setValue, watch, getValues } = form
   const isThreeBucketMethod = useMemo(
     () => watch('method') === 'ThreeBucket',
     [watch('method')]
   )
 
-  const handleSelectCategory = (value: Choice<number>['value']) => {
-    setSelectedCategories((prev) => {
-      if (prev.includes(value)) {
-        return prev.filter((selected) => selected !== value)
-      }
-
-      return [...prev, value]
-    })
-  }
-
   const onSubmit = async (values: BudgetSetting) => {
-    const budget = await createBudget({ values })
-    if (!budget.success) {
-      toast({
-        title: 'Unable to create budget',
+    const response = await createBudget({ values })
+    if (response.error) {
+      return toast({
+        title: response.error.message,
         description: 'Please try again.',
       })
-
-      return
     }
 
+    toast({
+      title: response.success.message,
+      description: 'Redirecting you to finance dashboard.',
+    })
+
     await completeUserOnboarding()
-    onSubmitCallback()
+
+    if (onSubmitCallback) {
+      onSubmitCallback()
+    } else {
+      router.push('/finance')
+    }
   }
 
   const onTotalAmountChange = (value: string) => {
     const newAmount = parseFloat(value)
-    const formValues = watch()
+    const formValues = getValues()
 
     if (isThreeBucketBudget(formValues)) {
       INITIAL_BUDGETS['ThreeBucket'].forEach((budget, index) => {
@@ -113,13 +101,128 @@ export const BudgetSettingForm = ({
     }
   }
 
+  return (
+    <div className="space-y-4">
+      <SectionLayout className="flex items-center gap-4">
+        <Button
+          variant="ghost"
+          className="rounded-full p-4"
+          onClick={() => router.back()}
+        >
+          <MoveLeft className="!h-8 !w-8" />
+        </Button>
+
+        <div className="py-2">
+          <h2 className="text-lg font-bold">Manage Budgets</h2>
+          <p className="text-sm">Track your spendings</p>
+        </div>
+      </SectionLayout>
+
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="mx-auto grid max-w-screen-xl space-y-4"
+        >
+          <MethodSelection />
+
+          <div
+            className={cn('grid gap-4', {
+              'lg:grid-cols-2': isThreeBucketMethod,
+            })}
+          >
+            {isThreeBucketMethod && (
+              <div className="flex flex-col gap-4">
+                <SectionLayout className="h-max">
+                  <FormField
+                    control={control}
+                    name="totalAmount"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel>Total Amount</FormLabel>
+                        <FormControl>
+                          <CurrencyInput
+                            {...field}
+                            onChange={(e: any) => {
+                              field.onChange(e)
+                              onTotalAmountChange(e)
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </SectionLayout>
+
+                <SectionLayout className="h-full">
+                  <FormField
+                    control={control}
+                    name="recurringPeriod"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel>Recurring Period</FormLabel>
+                        <FormControl>
+                          <OptionSelect
+                            variant="single"
+                            className="relative h-full flex-1 rounded-md py-4"
+                            contentContainerStyle="flex flex-col"
+                            choices={RECURRING_PERIODS}
+                            selected={field.value}
+                            onSelectionChange={field.onChange}
+                            hasAnimation={false}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </SectionLayout>
+              </div>
+            )}
+
+            <div className="grid gap-4">
+              <SectionLayout className="flex flex-col gap-3">
+                <FormLabel>Budgets</FormLabel>
+
+                {isThreeBucketMethod ? (
+                  <ThreeBucketFields />
+                ) : (
+                  <CategoryBasedFields />
+                )}
+              </SectionLayout>
+            </div>
+          </div>
+
+          <Button
+            className="btn-primary ml-auto w-[calc(50%-.8rem)]"
+            // disabled={!form.formState.isValid}
+          >
+            Submit
+          </Button>
+        </form>
+      </Form>
+    </div>
+  )
+}
+
+const MethodSelection = () => {
+  const { setSelectedCategories } = useBudgetForm()
+  const { control, reset, setValue, getValues, unregister } =
+    useFormContext<BudgetSetting>()
+
   const handleBudgetMethodChange = useCallback(
     (newMethod: BudgetSetting['method']) => {
       const formValues = getValues()
 
+      // if (newMethod === 'CategoryBased') {
+      //   unregister('buckets', { keepValue: true })
+      //   unregister('totalAmount', { keepValue: true })
+      // } else {
+      //   unregister('budgets', { keepValue: true })
+      // }
+
       if (isThreeBucketBudget(formValues)) {
         const totalAmount = formValues.totalAmount ?? 0
-
         const updatedBuckets = INITIAL_BUDGETS['ThreeBucket'].map((budget) => {
           return {
             ...budget,
@@ -150,108 +253,30 @@ export const BudgetSettingForm = ({
   )
 
   return (
-    <div className="space-y-4">
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="flex h-full w-full flex-col gap-4"
-        >
-          <SectionLayout>
-            <FormField
-              control={control}
-              name="method"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>Method</FormLabel>
-                  <FormControl>
-                    <OptionSelect
-                      variant="single"
-                      className="relative h-full flex-1 rounded-md py-4"
-                      contentContainerStyle="flex-col lg:flex-row"
-                      choices={BUDGET_METHODS}
-                      selected={field.value}
-                      onSelectionChange={(value) => {
-                        field.onChange(value)
-                        handleBudgetMethodChange(
-                          value as BudgetSetting['method']
-                        )
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </SectionLayout>
-
-          {isThreeBucketMethod && (
-            <SectionLayout>
-              <FormField
-                control={control}
-                name="totalAmount"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Total Amount</FormLabel>
-                    <FormControl>
-                      <CurrencyInput
-                        {...field}
-                        onChange={(e: any) => {
-                          field.onChange(e)
-                          onTotalAmountChange(e)
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+    <SectionLayout className="h-max">
+      <FormField
+        control={control}
+        name="method"
+        render={({ field }) => (
+          <FormItem className="w-full">
+            <FormLabel>Method</FormLabel>
+            <FormControl>
+              <OptionSelect
+                variant="single"
+                className="relative h-full flex-1 rounded-md py-4"
+                choices={BUDGET_METHODS}
+                selected={field.value}
+                onSelectionChange={(value) => {
+                  field.onChange(value)
+                  handleBudgetMethodChange(value as BudgetSetting['method'])
+                }}
+                hasAnimation={false}
               />
-            </SectionLayout>
-          )}
-
-          <SectionLayout className="flex flex-col gap-3">
-            <FormLabel>Budgets</FormLabel>
-
-            {isThreeBucketMethod ? (
-              <ThreeBucketFields
-                categories={categories ?? []}
-                selectedCategories={selectedCategories}
-                onSelectCategory={handleSelectCategory}
-              />
-            ) : (
-              <CategoryBasedFields
-                categories={categories ?? []}
-                selectedCategories={selectedCategories}
-                onSelectCategory={handleSelectCategory}
-              />
-            )}
-          </SectionLayout>
-
-          <SectionLayout>
-            <FormField
-              control={control}
-              name="recurringPeriod"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>Recurring Period</FormLabel>
-                  <FormControl>
-                    <OptionSelect
-                      variant="single"
-                      className="relative h-full flex-1 rounded-md py-4"
-                      contentContainerStyle="flex-col lg:flex-row"
-                      choices={RECURRING_PERIODS}
-                      selected={field.value}
-                      onSelectionChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </SectionLayout>
-
-          <Button>Submit</Button>
-        </form>
-      </Form>
-    </div>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </SectionLayout>
   )
 }
