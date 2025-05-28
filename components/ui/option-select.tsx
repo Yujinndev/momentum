@@ -13,6 +13,7 @@ type BaseProps<T> = {
   globalSelection?: Choice<T>['value'][]
   className?: string
   contentContainerStyle?: string
+  hasAnimation?: boolean
 }
 
 type MultiSelectProps<T> = BaseProps<T> & {
@@ -49,6 +50,7 @@ export const OptionSelect = React.memo(<T,>(props: OptionSelectProps<T>) => {
     globalSelection = [],
     className,
     contentContainerStyle,
+    hasAnimation,
   } = props
 
   const handleSelect = (value: Value<T>) => {
@@ -94,7 +96,7 @@ export const OptionSelect = React.memo(<T,>(props: OptionSelectProps<T>) => {
             key={index}
             choice={choice}
             isSelected={isSelected}
-            hasAnimation={variant !== 'single'}
+            hasAnimation={hasAnimation}
             onClick={() => {
               if (variant === 'single' && isSelected) return
 
@@ -141,9 +143,9 @@ const SelectButton = <T,>({
       }}
       transition={[transitionProps, { backgroundColor: { duration: 0.1 } }]}
       className={cn(
-        'relative inline-flex items-center overflow-hidden whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-zinc-400 ring-1 ring-inset ring-[hsla(0,0%,100%,0.06)] disabled:cursor-not-allowed',
+        'relative inline-flex items-center overflow-hidden whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-white ring-1 ring-inset ring-[hsla(0,0%,100%,0.06)] disabled:cursor-not-allowed dark:text-zinc-400',
         {
-          'text-white/80 ring-1 ring-blue-400': isSelected,
+          'text-white ring-1 ring-blue-400': isSelected,
         },
         className
       )}
@@ -151,7 +153,7 @@ const SelectButton = <T,>({
       disabled={disabled}
     >
       <motion.div
-        className="relative flex w-full items-center justify-between"
+        className="relative flex w-full items-center justify-between text-white"
         animate={{
           width: isSelected && hasAnimation ? 'auto' : '100%',
           paddingRight: isSelected && hasAnimation ? '1.5rem' : '0',

@@ -12,42 +12,54 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Plus } from 'lucide-react'
 
 type DialogFormWrapperProps = {
+  title: string
   open: boolean
   setOpen: (value: boolean) => void
-  title: string
+  children: React.ReactNode
   showTrigger?: boolean
   icon?: React.ReactNode
   className?: string
-  children: React.ReactNode
+  contentContainerClassName?: string
 }
 
 export const DialogFormWrapper = ({
+  title,
   open,
   setOpen,
-  title,
+  children,
   icon = <Plus />,
   showTrigger = true,
   className,
-  children,
+  contentContainerClassName,
 }: DialogFormWrapperProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       {showTrigger && (
         <div
           className={cn(
-            'flex aspect-video h-28 w-full flex-col items-center justify-center gap-2 rounded-xl border bg-muted-foreground/10 text-center lg:h-40 lg:w-20',
+            'relative flex h-full w-full flex-col items-center justify-center gap-2 rounded-xl border bg-muted-foreground/10 py-4 text-center lg:w-40',
             className
           )}
         >
           <DialogTrigger asChild>
-            <Button variant="outline" className="h-12 w-12 rounded-full">
+            <Button
+              type="button"
+              variant="outline"
+              className="h-12 w-12 rounded-full"
+            >
               {icon}
             </Button>
           </DialogTrigger>
           <h3 className="text-sm font-semibold">{title}</h3>
         </div>
       )}
-      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-md lg:max-w-screen-lg">
+
+      <DialogContent
+        className={cn(
+          'max-h-[80vh] overflow-y-auto sm:max-w-md lg:max-w-screen-lg',
+          contentContainerClassName
+        )}
+      >
         <VisuallyHidden>
           <DialogTitle>{title}</DialogTitle>
         </VisuallyHidden>
