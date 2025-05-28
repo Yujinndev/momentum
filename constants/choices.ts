@@ -119,6 +119,7 @@ export const BUDGET_METHODS = [
 ] satisfies Array<Choice<string>>
 
 export const RECURRING_PERIODS = [
+  { label: 'None', value: 'NONE' },
   { label: 'Daily', value: 'DAILY' },
   { label: 'Weekly', value: 'WEEKLY' },
   { label: 'Monthly', value: 'MONTHLY' },
@@ -149,6 +150,12 @@ export const INITIAL_BUDGETS = {
   ],
 
   CategoryBased: [
-    { categories: undefined, name: '', totalAmount: 0, percentage: 0 },
+    {
+      categories: undefined,
+      name: '',
+      totalAmount: 0,
+      percentage: 0,
+      recurringPeriod: 'NONE' as const,
+    },
   ],
 }

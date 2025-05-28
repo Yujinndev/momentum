@@ -1,14 +1,8 @@
 import { z } from 'zod'
 
-export const baseBudgetSchema = z.object({
-  method: z.enum(['ThreeBucket', 'CategoryBased']),
-  recurringPeriod: z.enum(['DAILY', 'WEEKLY', 'MONTHLY', 'ANNUALLY']),
-})
-
-export type BaseBudget = z.infer<typeof baseBudgetSchema>
-
-export const threeBucketSchema = baseBudgetSchema.extend({
+const threeBucketSchema = z.object({
   method: z.literal('ThreeBucket'),
+  recurringPeriod: z.enum(['DAILY', 'WEEKLY', 'MONTHLY', 'ANNUALLY', 'NONE']),
   totalAmount: z.coerce
     .number()
     .positive({
@@ -43,10 +37,9 @@ export const threeBucketSchema = baseBudgetSchema.extend({
       { message: 'Overall percentage must be equal to 100.' }
     ),
 })
-
 export type ThreeBucketBudget = z.infer<typeof threeBucketSchema>
 
-export const categoryBasedSchema = baseBudgetSchema.extend({
+const categoryBasedSchema = z.object({
   method: z.literal('CategoryBased'),
   budgets: z
     .array(
@@ -56,6 +49,13 @@ export const categoryBasedSchema = baseBudgetSchema.extend({
           .min(1, { message: 'Category is required.' }),
         name: z.string().min(1, { message: 'Name is required.' }),
         percentage: z.coerce.number().nonnegative().finite().default(0),
+        recurringPeriod: z.enum([
+          'DAILY',
+          'WEEKLY',
+          'MONTHLY',
+          'ANNUALLY',
+          'NONE',
+        ]),
         totalAmount: z.coerce
           .number()
           .positive({
@@ -66,7 +66,6 @@ export const categoryBasedSchema = baseBudgetSchema.extend({
     )
     .min(1, { message: 'Kindly add your budget' }),
 })
-
 export type CategoryBasedBudget = z.infer<typeof categoryBasedSchema>
 
 export const budgetSettingSchema = z.discriminatedUnion('method', [
@@ -90,5 +89,5 @@ export type DetailedBudget = {
   endDate: Date
   isRecurring: boolean
   trackBy: 'ALL' | 'CATEGORY'
-  recurringPeriod: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'ANNUALLY' | null
+  recurringPeriod: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'ANNUALLY' | 'NONE' | null
 }
