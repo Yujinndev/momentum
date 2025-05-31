@@ -19,10 +19,6 @@ export const deleteWallet = async ({ id }: DeleteWalletArgs) => {
       where: { id, userId: user.id },
     })
 
-    if (!wallet) {
-      throw new Error('Wallet not found or unauthorized access')
-    }
-
     await prisma.wallet.update({
       where: { id: wallet.id },
       data: { deletedAt: new Date() },

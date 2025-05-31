@@ -1,30 +1,42 @@
 'use server'
 
+import { getAuthUser } from '@/actions/account/get-auth-user'
 import { prisma } from '@/lib/prisma'
 import { Prisma, PrismaClient } from '@prisma/client'
 
 type GetWalletArgs = {
   tx?: PrismaClient | Prisma.TransactionClient
-  userId: string
   walletId: string
 }
 
-export const getWallet = async ({
-  tx = prisma,
-  userId,
-  walletId,
-}: GetWalletArgs) => {
-  try {
-    const wallet = await tx.wallet.findFirst({
-      where: { userId: userId, id: walletId },
-    })
+export const getWallet = async ({ tx = prisma, walletId }: GetWalletArgs) => {
+  const { user } = await getAuthUser()
 
-    if (!wallet) {
-      throw new Error('Wallet not found or unauthorized access')
+  try {
+    if (!user) {
+      throw new Error('No user found')
     }
 
-    return wallet
+    const response = await tx.wallet.findFirstOrThrow({
+      where: { userId: user.id, id: walletId },
+      include: { transactions: true },
+    })
+
+    const wallet = {
+      ...response,
+      balance: Number(response.balance),
+      transactions: response.transactions.map((transaction) => ({
+        ...transaction,
+        amount: Number(transaction.amount),
+        walletRunningBalance: Number(transaction.walletRunningBalance),
+      })),
+    }
+
+    return {
+      wallet,
+      success: { message: 'Wallet fetched successfully' },
+    }
   } catch (error) {
-    throw error
+    return { error: 'Failed to fetch wallet', details: error }
   }
 }

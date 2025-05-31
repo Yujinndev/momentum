@@ -10,7 +10,7 @@ type UpdateWalletArgs = {
   values: Partial<Wallet>
 }
 
-export async function updateWallet({ id, values }: UpdateWalletArgs) {
+export const updateWallet = async ({ id, values }: UpdateWalletArgs) => {
   const { user } = await getAuthUser()
 
   try {
@@ -24,10 +24,6 @@ export async function updateWallet({ id, values }: UpdateWalletArgs) {
           AND: [{ userId: user.id }, { id: id }],
         },
       })
-
-      if (!wallet) {
-        throw new Error('Wallet not found or unauthorized access')
-      }
 
       const updatedWallet = await tx.wallet.update({
         where: { id: wallet.id },
