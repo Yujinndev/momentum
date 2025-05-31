@@ -1,6 +1,6 @@
 import { WalletList } from './wallet-list'
-import { TransactionList } from './transaction-list'
 import { SectionLayout } from '@/components/layout/section-layout'
+import { TransactionList } from '@/components/finance/transaction-list'
 import { getUserTransactions } from '@/actions/finance/transaction/get-user-transactions'
 import { getUserWallets } from '@/actions/finance/wallet/get-user-wallets'
 

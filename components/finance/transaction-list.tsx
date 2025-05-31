@@ -10,20 +10,24 @@ interface TransactionListProps {
   items: DetailedTransaction[]
   count?: number
   className?: string
+  title?: string
+  showViewAll?: boolean
 }
 
 export const TransactionList = ({
   items,
   count = 5,
   className,
+  title = 'Recent Activity',
+  showViewAll = true,
 }: TransactionListProps) => {
-  const transactionsCount = items.length
+  const transactionsCount = Math.min(count, items.length)
 
   return (
     <div
       className={cn(
         'mx-auto flex min-h-96 w-full flex-col',
-        'bg-white dark:bg-zinc-900/70',
+        'bg-zinc-50/70 dark:bg-zinc-900/70',
         'border border-zinc-100 dark:border-zinc-800',
         'rounded-xl shadow-sm backdrop-blur-xl',
         className
@@ -32,7 +36,7 @@ export const TransactionList = ({
       <div className="p-4">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-            Recent Activity
+            {title}
           </h2>
           <span className="ml-1 text-xs font-normal text-zinc-600 dark:text-zinc-400">
             {transactionsCount}
@@ -105,33 +109,16 @@ export const TransactionList = ({
 
       <div className="h-full" />
 
-      <div className="border-t border-zinc-100 p-2 dark:border-zinc-800">
-        <Button
-          className={cn(
-            'flex w-full items-center justify-center gap-2',
-            'rounded-lg px-3 py-2',
-            'text-xs font-medium',
-            'bg-gradient-to-r from-zinc-900 to-zinc-800',
-            'dark:from-zinc-50 dark:to-zinc-200',
-            'text-zinc-50 dark:text-zinc-900',
-            'hover:from-zinc-800 hover:to-zinc-700',
-            'dark:hover:from-zinc-200 dark:hover:to-zinc-300',
-            'shadow-sm hover:shadow',
-            'transform transition-all duration-200',
-            'hover:-translate-y-0.5',
-            'active:translate-y-0',
-            'focus:outline-none focus:ring-2',
-            'focus:ring-zinc-500 dark:focus:ring-zinc-400',
-            'focus:ring-offset-2 dark:focus:ring-offset-zinc-900'
-          )}
-          asChild
-        >
-          <Link href="/finance">
-            <span>View All Transactions</span>
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        </Button>
-      </div>
+      {showViewAll && (
+        <div className="border-t border-zinc-100 p-2 dark:border-zinc-800">
+          <Button className="btn-primary" asChild>
+            <Link href="/finance">
+              <span>View All Transactions</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
