@@ -34,7 +34,6 @@ import {
   RECURRING_PERIODS,
   THREE_BUCKET_CATEGORIES,
 } from '@/constants/choices'
-import { Budget } from '@prisma/client'
 import { cn } from '@/lib/utils'
 
 type BudgetSettingFormProps = {
@@ -57,10 +56,9 @@ export const BudgetSettingForm = ({
     },
   })
   const { control, setValue, watch, getValues } = form
-  const isThreeBucketMethod = useMemo(
-    () => watch('method') === 'ThreeBucket',
-    [watch('method')]
-  )
+
+  const method = watch('method')
+  const isThreeBucketMethod = useMemo(() => method === 'ThreeBucket', [method])
 
   const onSubmit = async (values: BudgetSetting) => {
     const response = await createBudget({ values })
@@ -105,11 +103,11 @@ export const BudgetSettingForm = ({
     <div className="space-y-4">
       <SectionLayout className="flex items-center gap-4">
         <Button
-          variant="ghost"
-          className="rounded-full p-4"
+          variant="outline"
+          className="h-14 w-14 rounded-full p-2"
           onClick={() => router.back()}
         >
-          <MoveLeft className="!h-8 !w-8" />
+          <MoveLeft className="!h-4 !w-4 lg:!h-6 lg:!w-6" />
         </Button>
 
         <div className="py-2">
@@ -193,10 +191,7 @@ export const BudgetSettingForm = ({
             </div>
           </div>
 
-          <Button
-            className="btn-primary ml-auto w-[calc(50%-.8rem)]"
-            // disabled={!form.formState.isValid}
-          >
+          <Button className="btn-primary ml-auto w-[calc(50%-.8rem)]">
             Submit
           </Button>
         </form>
@@ -207,19 +202,12 @@ export const BudgetSettingForm = ({
 
 const MethodSelection = () => {
   const { setSelectedCategories } = useBudgetForm()
-  const { control, reset, setValue, getValues, unregister } =
+  const { control, reset, setValue, getValues } =
     useFormContext<BudgetSetting>()
 
   const handleBudgetMethodChange = useCallback(
     (newMethod: BudgetSetting['method']) => {
       const formValues = getValues()
-
-      // if (newMethod === 'CategoryBased') {
-      //   unregister('buckets', { keepValue: true })
-      //   unregister('totalAmount', { keepValue: true })
-      // } else {
-      //   unregister('budgets', { keepValue: true })
-      // }
 
       if (isThreeBucketBudget(formValues)) {
         const totalAmount = formValues.totalAmount ?? 0
@@ -249,7 +237,7 @@ const MethodSelection = () => {
 
       setValue('method', newMethod)
     },
-    [reset, getValues]
+    [reset, getValues, setSelectedCategories, setValue]
   )
 
   return (

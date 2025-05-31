@@ -18,21 +18,16 @@ import { COLORSCHEMES } from '@/constants/choices'
 import { Category, categorySchema } from '@/types/category'
 import { createCategory } from '@/actions/finance/category/create-category'
 
-interface IAddCategoryForm {
-  profileId: string
+type AddCategoryFormProps = {
   onSubmitCallback: () => void
 }
 
-export const AddCategoryForm = ({
-  onSubmitCallback,
-  profileId,
-}: IAddCategoryForm) => {
+export const AddCategoryForm = ({ onSubmitCallback }: AddCategoryFormProps) => {
   const form = useForm<Category>({
     resolver: zodResolver(categorySchema),
     defaultValues: {
       name: '',
       color: 'BLACK',
-      financialProfileId: profileId,
     },
   })
 

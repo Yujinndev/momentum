@@ -79,8 +79,8 @@ export const WalletForm = ({
       <SectionLayout className="flex h-max items-center gap-4">
         {showBackButton && (
           <Button
-            variant="ghost"
-            className="rounded-full p-4"
+            variant="outline"
+            className="h-14 w-14 rounded-full p-2"
             onClick={() => router.back()}
           >
             <MoveLeft className="!h-4 !w-4 lg:!h-6 lg:!w-6" />

@@ -1,5 +1,8 @@
 'use client'
 
+import { cn } from '@/lib/utils'
+import { Plus } from 'lucide-react'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -7,9 +10,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { cn } from '@/lib/utils'
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
-import { Plus } from 'lucide-react'
 
 type DialogFormWrapperProps = {
   title: string
@@ -37,7 +37,7 @@ export const DialogFormWrapper = ({
       {showTrigger && (
         <div
           className={cn(
-            'relative flex h-full w-full flex-col items-center justify-center gap-2 rounded-xl border bg-muted-foreground/10 py-4 text-center lg:w-40',
+            'relative flex h-full w-full flex-col items-center justify-center gap-2 rounded-xl border bg-muted-foreground/10 py-4 text-center',
             className
           )}
         >

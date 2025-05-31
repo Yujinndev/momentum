@@ -1,15 +1,13 @@
-'use client'
+import { BudgetSetting } from './form'
+import { getUserCategories } from '@/actions/finance/category/get-user-categories'
+import { BudgetFormProvider } from '@/contexts/budget-form-context'
 
-import { useOnboardingNavigation } from '@/hooks/use-onboarding-navigation'
-import { OnboardingWrapper } from '@/components/account/onboarding-wrapper'
-import { BudgetSettingForm } from '@/components/finance/budget-form'
-
-export default function BudgetSetting() {
-  const { handleNextPage } = useOnboardingNavigation()
+export default async function Page() {
+  const categories = await getUserCategories()
 
   return (
-    <OnboardingWrapper>
-      <BudgetSettingForm onSubmitCallback={handleNextPage} />
-    </OnboardingWrapper>
+    <BudgetFormProvider categories={categories.items}>
+      <BudgetSetting />
+    </BudgetFormProvider>
   )
 }

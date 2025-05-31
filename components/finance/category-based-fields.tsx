@@ -187,7 +187,7 @@ const BudgetEdit = ({
         control={control}
         name={`budgets.${index}.categories`}
         render={({ field }) => {
-          const selectedValue: number = field.value
+          const selectedValue = field.value === -1 ? undefined : field.value
 
           return (
             <FormItem className="w-full">

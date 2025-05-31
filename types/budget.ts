@@ -46,7 +46,8 @@ const categoryBasedSchema = z.object({
       z.object({
         categories: z.coerce
           .number({ message: 'Category is required.' })
-          .min(1, { message: 'Category is required.' }),
+          .positive()
+          .finite(),
         name: z.string().min(1, { message: 'Name is required.' }),
         percentage: z.coerce.number().nonnegative().finite().default(0),
         recurringPeriod: z.enum([
@@ -88,6 +89,5 @@ export type DetailedBudget = {
   startDate: Date
   endDate: Date
   isRecurring: boolean
-  trackBy: 'ALL' | 'CATEGORY'
   recurringPeriod: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'ANNUALLY' | 'NONE' | null
 }

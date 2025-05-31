@@ -12,6 +12,7 @@ export default async function NewTransaction() {
     <AddTransactionForm
       wallets={wallets.items}
       categories={categories?.items}
+      className="max-w-screen-xl"
     />
   )
 }

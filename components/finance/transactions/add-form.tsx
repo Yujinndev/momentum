@@ -134,11 +134,11 @@ export function AddTransactionForm({
     <div className={cn('relative mx-auto space-y-6 rounded-md', className)}>
       <SectionLayout className="flex items-center gap-4">
         <Button
-          variant="ghost"
-          className="rounded-full p-4"
+          variant="outline"
+          className="h-14 w-14 rounded-full p-2"
           onClick={() => router.back()}
         >
-          <MoveLeft className="!h-6 !w-6" />
+          <MoveLeft className="!h-4 !w-4 lg:!h-6 lg:!w-6" />
         </Button>
 
         <div className="py-2">
