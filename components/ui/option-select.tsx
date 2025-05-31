@@ -110,6 +110,8 @@ export const OptionSelect = React.memo(<T,>(props: OptionSelectProps<T>) => {
   )
 })
 
+OptionSelect.displayName = 'OptionSelect'
+
 type SelectButtonProps<T> = {
   choice: Choice<T>
   isSelected: boolean

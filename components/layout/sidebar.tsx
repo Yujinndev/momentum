@@ -54,6 +54,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                     tooltip={item.name}
                     className={cn('h-10 px-4 hover:bg-accent', {
                       'bg-muted': pathname.startsWith(item.url),
+                      hidden: !item.isVisible,
                     })}
                     asChild
                   >
