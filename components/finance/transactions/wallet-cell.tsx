@@ -15,7 +15,7 @@ export function WalletCell({ walletId }: WalletCellProps) {
   if (!isSuccess || isLoading) return <Skeleton />
 
   const wallet = wallets?.items?.find(({ id }) => id === walletId)
-  const color = getColorScheme(wallet?.color!)
+  const color = getColorScheme(wallet?.color as string)
 
   return (
     <div

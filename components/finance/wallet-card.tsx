@@ -5,16 +5,17 @@ import { Button } from '@/components/ui/button'
 import { Pencil } from 'lucide-react'
 
 type WalletCardProps = {
-  wallet: Wallet
+  wallet: Wallet & { id?: string }
   onEdit?: () => void
+  className?: string
 }
 
-export const WalletCard = ({ wallet, onEdit }: WalletCardProps) => {
+export const WalletCard = ({ wallet, onEdit, className }: WalletCardProps) => {
   const color = getColorScheme(wallet?.color)
   const type = getWalletType(wallet?.type)
 
   return (
-    <div className="relative">
+    <div data-id={wallet.id} className={cn('wallet-card relative', className)}>
       {onEdit && (
         <Button
           variant="ghost"
@@ -42,9 +43,16 @@ export const WalletCard = ({ wallet, onEdit }: WalletCardProps) => {
           )}
         />
         <div className={cn('polygon absolute inset-0 w-full', color?.accent)} />
+
         <div className="z-30 flex h-full flex-col justify-between">
           <h2 className="font-semibold">
-            {wallet?.name === '' ? 'Wallet Name' : wallet?.name}
+            {wallet?.name !== '' ? (
+              <span>{wallet.name}</span>
+            ) : (
+              <span className="font-light text-zinc-400 dark:text-zinc-400">
+                Unnamed
+              </span>
+            )}
           </h2>
           <p className="text-base font-light">{wallet.description}</p>
 
