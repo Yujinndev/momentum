@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from 'react'
 import { cn } from '@/lib/utils'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { MoveLeft } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -44,16 +44,24 @@ import { Category } from '@prisma/client'
 type AddTransactionFormProps = {
   wallets: WalletWithId[]
   categories: Category[]
+  className?: string
 }
 
 export function AddTransactionForm({
   wallets,
   categories,
+  className,
 }: AddTransactionFormProps) {
   const router = useRouter()
   const { toast } = useToast()
+  const searchParams = useSearchParams()
 
-  const defaultWallet = wallets.find((item) => item.isDefault)
+  const selectedWallet = searchParams.get('wallet-id')
+
+  const defaultWallet = selectedWallet
+    ? selectedWallet
+    : wallets.find((item) => item.isDefault)?.id
+
   const form = useForm<Transaction>({
     shouldUnregister: true,
     resolver: zodResolver(transactionSchema),
@@ -62,31 +70,32 @@ export function AddTransactionForm({
       categoryId: undefined,
       amount: 0.0,
       type: 'EXPENSE',
-      walletId: defaultWallet?.id,
+      walletId: defaultWallet,
       transactionDate: new Date(),
       budgetId: undefined,
     },
   })
 
+  const walletId = form.watch('walletId')
   const currentWallet = useMemo(
-    () => wallets && getWalletById(wallets, form.watch('walletId')),
-    [form.watch('walletId')]
+    () => wallets && getWalletById(wallets, walletId),
+    [walletId, wallets]
   )
 
+  const receivingWalletId = form.watch('receivingWalletId')
   const receivingWallet = useMemo(
-    () => getWalletById(wallets, form.watch('receivingWalletId')),
-    [form.watch('receivingWalletId')]
+    () => getWalletById(wallets, receivingWalletId),
+    [receivingWalletId, wallets]
   )
 
   useEffect(() => {
     const isSenderAndReceiverTheSame =
-      form.watch('receivingWalletId') &&
-      form.watch('receivingWalletId') === form.watch('walletId')
+      receivingWalletId && receivingWalletId === walletId
 
     if (isSenderAndReceiverTheSame) {
       form.resetField('receivingWalletId', { keepDirty: true })
     }
-  }, [form.watch('walletId'), form.watch('receivingWalletId')])
+  }, [walletId, receivingWalletId, form])
 
   const onSubmit = async (values: Transaction) => {
     if (!currentWallet) {
@@ -122,14 +131,14 @@ export function AddTransactionForm({
   const { title, description, cta } = FORM_DETAILS.transaction.create
 
   return (
-    <div className="m-auto space-y-8 rounded-md">
+    <div className={cn('relative mx-auto space-y-6 rounded-md', className)}>
       <SectionLayout className="flex items-center gap-4">
         <Button
           variant="ghost"
-          className="h-8 w-8 rounded-full"
+          className="rounded-full p-4"
           onClick={() => router.back()}
         >
-          <MoveLeft />
+          <MoveLeft className="!h-6 !w-6" />
         </Button>
 
         <div className="py-2">
@@ -355,7 +364,7 @@ export function AddTransactionForm({
 
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="btn-primary w-full"
                   isLoading={form.formState.isSubmitting}
                 >
                   {form.formState.isSubmitting ? cta.pending : cta.default}
