@@ -39,7 +39,7 @@ const Header = () => {
         <div className="flex items-center gap-3">
           <ThemeToggle />
 
-          {session?.user && (
+          {session?.user && session?.user?.image && session?.user?.name && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -47,10 +47,12 @@ const Header = () => {
                   className="relative size-10 rounded-full border ring-1"
                 >
                   <Avatar className="size-10">
-                    <AvatarImage
-                      src={session?.user?.image!}
-                      alt={session?.user?.name!}
-                    />
+                    {
+                      <AvatarImage
+                        src={session?.user?.image}
+                        alt={session?.user?.name}
+                      />
+                    }
                     <AvatarFallback>
                       {session?.user?.name?.split(' ')[0]}
                     </AvatarFallback>

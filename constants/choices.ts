@@ -151,7 +151,7 @@ export const INITIAL_BUDGETS = {
 
   CategoryBased: [
     {
-      categories: undefined,
+      categories: -1,
       name: '',
       totalAmount: 0,
       percentage: 0,
