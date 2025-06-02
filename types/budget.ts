@@ -90,4 +90,5 @@ export type DetailedBudget = {
   endDate: Date
   isRecurring: boolean
   recurringPeriod: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'ANNUALLY' | 'NONE' | null
+  categories?: number[]
 }
