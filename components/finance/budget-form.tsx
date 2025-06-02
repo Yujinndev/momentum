@@ -11,7 +11,11 @@ import { createBudget } from '@/actions/finance/budget/create-budget'
 import { completeUserOnboarding } from '@/actions/account/complete-onboarding'
 import { CategoryBasedFields } from '@/components/finance/category-based-fields'
 import { ThreeBucketFields } from '@/components/finance/three-buckets-fields'
-import { BudgetSetting, budgetSettingSchema } from '@/types/budget'
+import {
+  BudgetSetting,
+  budgetSettingSchema,
+  DetailedBudget,
+} from '@/types/budget'
 import { SectionLayout } from '@/components/layout/section-layout'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { OptionSelect } from '@/components/ui/option-select'
@@ -35,25 +39,43 @@ import {
   THREE_BUCKET_CATEGORIES,
 } from '@/constants/choices'
 import { cn } from '@/lib/utils'
+import { BudgetMethod } from '@prisma/client'
 
 type BudgetSettingFormProps = {
+  budget?: {
+    items: DetailedBudget[]
+    method: BudgetMethod
+    totalAmount: number
+  }
   onSubmitCallback?: () => void
 }
 
 export const BudgetSettingForm = ({
+  budget,
   onSubmitCallback,
 }: BudgetSettingFormProps) => {
   const router = useRouter()
+
+  const values = budget
+    ? budget?.method === 'ThreeBucket'
+      ? {
+          buckets: budget?.items,
+          method: budget?.method,
+          totalAmount: budget.totalAmount,
+          recurringPeriod: budget.items[0].recurringPeriod,
+        }
+      : { budgets: budget?.items, method: budget?.method }
+    : {
+        totalAmount: 0,
+        method: 'ThreeBucket' as const,
+        buckets: INITIAL_BUDGETS['ThreeBucket'],
+      }
 
   const form = useForm<BudgetSetting>({
     resolver: zodResolver(budgetSettingSchema),
     mode: 'onChange',
     reValidateMode: 'onChange',
-    defaultValues: {
-      totalAmount: 0,
-      method: 'ThreeBucket',
-      buckets: INITIAL_BUDGETS['ThreeBucket'],
-    },
+    defaultValues: values,
   })
   const { control, setValue, watch, getValues } = form
 
