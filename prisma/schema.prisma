@@ -21,13 +21,14 @@ model User {
     deletedAt           DateTime? @db.Timestamptz(6)
 
     // RELATIONS
-    accounts     Account[]
-    sessions     Session[]
-    wallets      Wallet[]
-    categories   Category[]
-    transactions Transaction[]
-    savingsGoals SavingsGoal[]
-    budgets      Budget[]
+    accounts         Account[]
+    sessions         Session[]
+    wallets          Wallet[]
+    categories       Category[]
+    transactions     Transaction[]
+    savingsGoals     SavingsGoal[]
+    budgets          Budget[]
+    budgetPreference BudgetPreference[]
 
     @@index([name])
     @@index([email])
@@ -211,9 +212,27 @@ enum RecurringPeriod {
     ANNUALLY
 }
 
-enum BudgetTracking {
-    ALL
-    CATEGORY
+enum BudgetMethod {
+    ThreeBucket
+    CategoryBased
+}
+
+model BudgetPreference {
+    id        Int          @id @default(autoincrement())
+    method    BudgetMethod
+    createdAt DateTime?    @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime?    @updatedAt @db.Timestamptz(6)
+
+    // FOREIGN KEYS
+    userId String
+
+    // RELATIONS
+    user User @relation(fields: [userId], references: [id])
+
+    @@index([id])
+    @@index([method])
+    @@index([createdAt])
+    @@index([updatedAt])
 }
 
 model Budget {
@@ -225,7 +244,6 @@ model Budget {
     startDate       DateTime         @db.Timestamptz(6)
     endDate         DateTime         @db.Timestamptz(6)
     isRecurring     Boolean          @default(false)
-    trackBy         BudgetTracking   @default(CATEGORY)
     recurringPeriod RecurringPeriod?
     createdAt       DateTime?        @default(now()) @db.Timestamptz(6)
     updatedAt       DateTime?        @updatedAt @db.Timestamptz(6)
@@ -239,6 +257,7 @@ model Budget {
     categories   Category[]    @relation(name: "BudgetToCategories")
     transactions Transaction[]
 
+    @@index([id])
     @@index([name])
     @@index([createdAt])
     @@index([updatedAt])
