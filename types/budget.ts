@@ -49,7 +49,7 @@ const categoryBasedSchema = z.object({
     .array(
       z.object({
         id: z.string().optional(),
-        categories: z.coerce
+        category: z.coerce
           .number({ message: 'Category is required.' })
           .positive()
           .finite(),

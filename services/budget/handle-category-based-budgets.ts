@@ -14,13 +14,15 @@ export const HandleCategoryBasedBudgets = async ({
   isRetainingProgress,
 }: HandleCategoryBasedBudgetsArgs) => {
   const createdBudgets = values.budgets.map(async (budget) => {
+    const { id, category, ...rest } = budget
+
     const endDate = getRecurringPeriodDate({
       startDate,
       period: budget.recurringPeriod ?? 'NONE',
     })
 
     const data = {
-      ...budget,
+      ...rest,
       startDate,
       endDate,
       userId,
@@ -29,17 +31,18 @@ export const HandleCategoryBasedBudgets = async ({
         budget.recurringPeriod !== 'NONE' ? budget.recurringPeriod : null,
       isRecurring: budget.recurringPeriod !== 'NONE',
       categories: {
-        connect: { id: budget.categories },
+        connect: { id: category },
       },
     }
 
-    const res = await prisma.budget.upsert({
-      create: data,
-      update: data,
-      where: { id: budget.id, deletedAt: null },
-    })
-
-    return res
+    if (id) {
+      return await prisma.budget.update({
+        where: { id },
+        data,
+      })
+    } else {
+      return await prisma.budget.create({ data })
+    }
   })
 
   await Promise.all(createdBudgets)

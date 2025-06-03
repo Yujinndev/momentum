@@ -19,8 +19,10 @@ export const handleThreeBucketBudgets = async ({
   })
 
   const createdBuckets = values.buckets.map(async (bucket) => {
+    const { id, ...rest } = bucket
+
     const data = {
-      ...bucket,
+      ...rest,
       startDate,
       endDate,
       userId,
@@ -33,13 +35,14 @@ export const handleThreeBucketBudgets = async ({
       },
     }
 
-    const res = await prisma.budget.upsert({
-      create: data,
-      update: data,
-      where: { id: bucket.id, deletedAt: null },
-    })
-
-    return res
+    if (id) {
+      return await prisma.budget.update({
+        where: { id },
+        data,
+      })
+    } else {
+      return await prisma.budget.create({ data })
+    }
   })
 
   await Promise.all(createdBuckets)
