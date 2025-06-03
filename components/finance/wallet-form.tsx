@@ -2,8 +2,21 @@
 
 import { cn } from '@/lib/utils'
 import { useForm } from 'react-hook-form'
+import { toast } from '@/hooks/use-toast'
+import { useRouter } from 'next/navigation'
+import { MoveLeft } from 'lucide-react'
+import { FORM_DETAILS } from '@/constants/config'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { WalletCard } from '@/components/finance/wallet-card'
+import { CurrencyInput } from '@/components/ui/currency-input'
+import { SectionLayout } from '@/components/layout/section-layout'
+import { createWallet } from '@/actions/finance/wallet/create-wallet'
+import { updateWallet } from '@/actions/finance/wallet/update-wallet'
 import { Wallet, walletSchema, WalletWithId } from '@/types/wallet'
+import { COLORSCHEMES, WALLET_TYPES } from '@/constants/choices'
 import {
   Form,
   FormControl,
@@ -20,18 +33,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { WalletCard } from '@/components/finance/wallet-card'
-import { CurrencyInput } from '@/components/ui/currency-input'
-import { createWallet } from '@/actions/finance/wallet/create-wallet'
-import { updateWallet } from '@/actions/finance/wallet/update-wallet'
-import { COLORSCHEMES, WALLET_TYPES } from '@/constants/choices'
-import { FORM_DETAILS } from '@/constants/config'
-import { SectionLayout } from '../layout/section-layout'
-import { useRouter } from 'next/navigation'
-import { MoveLeft } from 'lucide-react'
 
 type AddWalletFormProps = {
   wallet?: WalletWithId
@@ -61,11 +62,21 @@ export const WalletForm = ({
   })
 
   const onSubmit = async (values: Wallet) => {
-    if (wallet) {
-      await updateWallet({ id: wallet.id, values })
-    } else {
-      await createWallet({ values })
+    const response = wallet
+      ? await updateWallet({ id: wallet.id, values })
+      : await createWallet({ values })
+
+    if (response.error) {
+      return toast({
+        title: response.error.message,
+        description: 'Please try again.',
+      })
     }
+
+    toast({
+      title: response.success.message,
+      description: 'You may view your updated wallet',
+    })
 
     onSubmitCallback?.()
   }
