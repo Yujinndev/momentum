@@ -42,6 +42,6 @@ export const createWallet = async ({ values }: CreateWalletArgs) => {
       success: { message: 'Wallet created successfully' },
     }
   } catch (error) {
-    return { error: 'Failed to create wallet', details: error }
+    return { error: { message: 'Failed to create wallet', details: error } }
   }
 }

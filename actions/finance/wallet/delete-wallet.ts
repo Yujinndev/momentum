@@ -28,6 +28,6 @@ export const deleteWallet = async ({ id }: DeleteWalletArgs) => {
       success: { message: 'User wallet deleted successfully' },
     }
   } catch (error) {
-    return { error: 'Failed to delete wallet', details: error }
+    return { error: { message: 'Failed to delete wallet', details: error } }
   }
 }

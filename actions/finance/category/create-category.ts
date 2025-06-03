@@ -41,8 +41,7 @@ export const createCategory = async ({ values }: CreateCategoryArgs) => {
     }
   } catch (error) {
     return {
-      error: 'Failed to create category',
-      details: error,
+      error: { message: 'Failed to create category', details: error },
     }
   }
 }

@@ -49,6 +49,6 @@ export const updateWallet = async ({ id, values }: UpdateWalletArgs) => {
       success: { message: 'Wallet updated successfully' },
     }
   } catch (error) {
-    return { error: 'Failed to update wallet', details: error }
+    return { error: { message: 'Failed to update wallet', details: error } }
   }
 }

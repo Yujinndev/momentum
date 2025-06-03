@@ -37,6 +37,6 @@ export const getWallet = async ({ tx = prisma, walletId }: GetWalletArgs) => {
       success: { message: 'Wallet fetched successfully' },
     }
   } catch (error) {
-    return { error: 'Failed to fetch wallet', details: error }
+    return { error: { message: 'Failed to fetch wallet', details: error } }
   }
 }
