@@ -6,7 +6,7 @@ import {
   useFieldArray,
   useFormContext,
 } from 'react-hook-form'
-import { useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { ChartPie, Edit } from 'lucide-react'
 import { useBudgetForm } from '@/contexts/budget-form-context'
@@ -98,10 +98,18 @@ const BucketError = ({
 }
 
 const BucketEdit = ({ index, control }: BucketProps) => {
+  const { setValue, getValues } = useFormContext()
   const { categories, selectedCategories, handleSelectCategory } =
     useBudgetForm()
 
   if (index === -1) return null
+
+  const onPercentageChange = (percentage: ChangeEvent<HTMLInputElement>) => {
+    const overallAmount = getValues('totalAmount')
+    const newBucketAmount = (Number(percentage) / 100) * overallAmount
+
+    setValue(`buckets.${index}.totalAmount`, newBucketAmount)
+  }
 
   return (
     <div className="space-y-4">
@@ -126,7 +134,14 @@ const BucketEdit = ({ index, control }: BucketProps) => {
           <FormItem className="w-full">
             <FormLabel>Percentage</FormLabel>
             <FormControl>
-              <CurrencyInput {...field} showIcon={false} />
+              <CurrencyInput
+                {...field}
+                onChange={(e) => {
+                  onPercentageChange(e)
+                  field.onChange(e)
+                }}
+                showIcon={false}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>

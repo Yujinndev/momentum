@@ -134,27 +134,31 @@ export const INITIAL_BUDGETS = {
       name: 'Needs',
       percentage: 60,
       totalAmount: 0,
+      spent: 0,
     },
     {
       categories: [12, 13, 14],
       name: 'Wants',
       percentage: 20,
       totalAmount: 0,
+      spent: 0,
     },
     {
       categories: [3, 6],
       name: 'Savings',
       percentage: 20,
       totalAmount: 0,
+      spent: 0,
     },
   ],
 
   CategoryBased: [
     {
-      categories: -1,
+      category: -1,
       name: '',
       totalAmount: 0,
       percentage: 0,
+      spent: 0,
       recurringPeriod: 'NONE' as const,
     },
   ],

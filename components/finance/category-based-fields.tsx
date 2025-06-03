@@ -164,7 +164,10 @@ const BudgetEdit = ({
         render={({ field }) => (
           <FormItem>
             <FormLabel>Recurring Period</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <Select
+              onValueChange={field.onChange}
+              defaultValue={field.value ?? 'NONE'}
+            >
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a recurring period" />
@@ -185,13 +188,13 @@ const BudgetEdit = ({
 
       <FormField
         control={control}
-        name={`budgets.${index}.categories`}
+        name={`budgets.${index}.category`}
         render={({ field }) => {
           const selectedValue = field.value === -1 ? undefined : field.value
 
           return (
             <FormItem className="w-full">
-              <FormLabel>Categories</FormLabel>
+              <FormLabel>Category</FormLabel>
               <FormControl>
                 <OptionSelect
                   variant="single"
@@ -226,7 +229,7 @@ const BudgetPreview = ({ control, index, totalBudgetsLength }: BudgetProps) => {
   const hasError =
     errors?.budgets?.[index]?.name?.message ||
     errors?.budgets?.[index]?.totalAmount?.message ||
-    errors?.budgets?.[index]?.categories?.message
+    errors?.budgets?.[index]?.category?.message
 
   return (
     <div
@@ -297,7 +300,7 @@ const BudgetPreview = ({ control, index, totalBudgetsLength }: BudgetProps) => {
 
       <div className="flex flex-wrap gap-2">
         {categories
-          .filter((category) => budgets.categories === category.value)
+          .filter((category) => budgets.category === category.value)
           .map((item) => (
             <div
               key={item.value}

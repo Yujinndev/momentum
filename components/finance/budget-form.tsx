@@ -3,23 +3,27 @@
 import { MoveLeft } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import { useRouter } from 'next/navigation'
-import { useCallback, useMemo } from 'react'
+import { ChangeEvent, useCallback, useMemo, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useFormContext } from 'react-hook-form'
 import { useBudgetForm } from '@/contexts/budget-form-context'
 import { createBudget } from '@/actions/finance/budget/create-budget'
-import { completeUserOnboarding } from '@/actions/account/complete-onboarding'
+import { updateBudget } from '@/actions/finance/budget/update-budget'
 import { CategoryBasedFields } from '@/components/finance/category-based-fields'
 import { ThreeBucketFields } from '@/components/finance/three-buckets-fields'
 import {
   BudgetSetting,
   budgetSettingSchema,
+  CategoryBasedBudget,
   DetailedBudget,
+  ThreeBucketBudget,
 } from '@/types/budget'
 import { SectionLayout } from '@/components/layout/section-layout'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { OptionSelect } from '@/components/ui/option-select'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 import {
   isCategoryBasedBudget,
   isThreeBucketBudget,
@@ -46,8 +50,9 @@ type BudgetSettingFormProps = {
     items: DetailedBudget[]
     method: BudgetMethod
     totalAmount: number
+    budgetPrefId: number
   }
-  onSubmitCallback?: () => void
+  onSubmitCallback?: () => void | Promise<void>
 }
 
 export const BudgetSettingForm = ({
@@ -55,21 +60,47 @@ export const BudgetSettingForm = ({
   onSubmitCallback,
 }: BudgetSettingFormProps) => {
   const router = useRouter()
+  const [isRetainingProgress, setIsRetainingProgress] = useState(false)
 
-  const values = budget
-    ? budget?.method === 'ThreeBucket'
-      ? {
-          buckets: budget?.items,
-          method: budget?.method,
-          totalAmount: budget.totalAmount,
-          recurringPeriod: budget.items[0].recurringPeriod,
-        }
-      : { budgets: budget?.items, method: budget?.method }
-    : {
+  const values = useMemo(() => {
+    if (!budget) {
+      return {
         totalAmount: 0,
         method: 'ThreeBucket' as const,
         buckets: INITIAL_BUDGETS['ThreeBucket'],
       }
+    }
+
+    const { method, items, totalAmount } = budget
+
+    if (method === 'ThreeBucket') {
+      return {
+        method,
+        totalAmount,
+        recurringPeriod: items[0]?.recurringPeriod ?? 'NONE',
+        buckets: items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          percentage: item.percentage ?? 0,
+          categories: item.categories ?? [],
+          totalAmount: item.totalAmount,
+          spent: item.spent,
+        })),
+      } satisfies ThreeBucketBudget
+    } else {
+      return {
+        method,
+        budgets: items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          category: item.categories?.[0] ?? -1,
+          recurringPeriod: item.recurringPeriod ?? 'NONE',
+          totalAmount: item.totalAmount,
+          spent: item.spent,
+        })),
+      } satisfies CategoryBasedBudget
+    }
+  }, [budget])
 
   const form = useForm<BudgetSetting>({
     resolver: zodResolver(budgetSettingSchema),
@@ -83,7 +114,14 @@ export const BudgetSettingForm = ({
   const isThreeBucketMethod = useMemo(() => method === 'ThreeBucket', [method])
 
   const onSubmit = async (values: BudgetSetting) => {
-    const response = await createBudget({ values })
+    const response = budget
+      ? await updateBudget({
+          values,
+          budgetPrefId: budget.budgetPrefId,
+          isRetainingProgress,
+        })
+      : await createBudget({ values })
+
     if (response.error) {
       return toast({
         title: response.error.message,
@@ -93,20 +131,18 @@ export const BudgetSettingForm = ({
 
     toast({
       title: response.success.message,
-      description: 'Redirecting you to finance dashboard.',
+      description: 'Redirecting...',
     })
 
-    await completeUserOnboarding()
-
     if (onSubmitCallback) {
-      onSubmitCallback()
+      await onSubmitCallback()
     } else {
       router.push('/finance')
     }
   }
 
-  const onTotalAmountChange = (value: string) => {
-    const newAmount = parseFloat(value)
+  const onTotalAmountChange = (value: ChangeEvent<HTMLInputElement>) => {
+    const newAmount = Number(value)
     const formValues = getValues()
 
     if (isThreeBucketBudget(formValues)) {
@@ -162,7 +198,7 @@ export const BudgetSettingForm = ({
                         <FormControl>
                           <CurrencyInput
                             {...field}
-                            onChange={(e: any) => {
+                            onChange={(e) => {
                               field.onChange(e)
                               onTotalAmountChange(e)
                             }}
@@ -210,10 +246,38 @@ export const BudgetSettingForm = ({
                   <CategoryBasedFields />
                 )}
               </SectionLayout>
+
+              {budget && budget.method === method && (
+                <Label
+                  htmlFor="isRetainingProgress"
+                  className="flex items-start gap-3 rounded-lg border border-zinc-100 bg-zinc-50/70 p-3 has-[[aria-checked=true]]:border-zinc-600 has-[[aria-checked=true]]:bg-[#1c3052] dark:border-zinc-800 dark:bg-zinc-900/70 dark:has-[[aria-checked=true]]:border-blue-400 dark:has-[[aria-checked=true]]:bg-[#1c3052]"
+                >
+                  <Checkbox
+                    id="isRetainingProgress"
+                    checked={isRetainingProgress}
+                    onCheckedChange={(checked) =>
+                      setIsRetainingProgress(!!checked)
+                    }
+                    className="data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white dark:data-[state=checked]:border-blue-700 dark:data-[state=checked]:bg-blue-700"
+                  />
+                  <div className="grid gap-1.5 font-normal">
+                    <p className="text-sm font-medium leading-none">
+                      Retain Progress and Transactions?
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      You can retain past activity like progress and
+                      transactions any time
+                    </p>
+                  </div>
+                </Label>
+              )}
             </div>
           </div>
 
-          <Button className="btn-primary ml-auto w-[calc(50%-.8rem)]">
+          <Button
+            className="btn-primary ml-auto w-full lg:w-[calc(50%-.8rem)]"
+            isLoading={form.formState.isSubmitting}
+          >
             Submit
           </Button>
         </form>
