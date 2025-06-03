@@ -1,28 +1,26 @@
 import { prisma } from '@/lib/prisma'
-import { Prisma } from '@prisma/client'
 import { Transaction } from '@/types/transaction'
-import { calculateBalance } from '@/utils/calculate-balance'
-import { getWallet } from '@/actions/finance/wallet/get-wallet'
+import { handleNewTransaction } from './handle-new-transaction'
+import { handleUpdateBudgetSpending } from './handle-update-budget-spending'
 
-type CreateTransactionServiceArgs<TValues = Transaction> = {
-  tx: Prisma.TransactionClient
-  values: TValues
+type CreateTransactionServiceArgs = {
+  values: Transaction
   userId: string
 }
 
 export const createTransactionService = async ({
   values,
   userId,
-}: Omit<CreateTransactionServiceArgs, 'tx'>) => {
+}: CreateTransactionServiceArgs) => {
   return await prisma.$transaction(async (tx) => {
     const createdTransaction = handleNewTransaction({
-      tx,
+      prisma: tx,
       userId,
       values,
       walletId: values.walletId,
     })
 
-    const context = { tx, values, userId }
+    const context = { prisma: tx, values, userId }
     switch (values.type) {
       case 'EXPENSE':
         await handleUpdateBudgetSpending(context)
@@ -43,56 +41,4 @@ export const createTransactionService = async ({
 
     return createdTransaction
   })
-}
-
-const handleNewTransaction = async ({
-  tx,
-  values,
-  userId,
-  walletId,
-}: CreateTransactionServiceArgs & { walletId: string }) => {
-  const wallet = await getWallet({ tx, userId, walletId })
-  const newBalance = calculateBalance({
-    txType: values.type,
-    txAmount: values.amount,
-    currentBalance: wallet.balance,
-    isSender: values.walletId === walletId,
-  })
-
-  const createdTransaction = await tx.transaction.create({
-    data: {
-      ...values,
-      userId,
-      walletRunningBalance: newBalance,
-    },
-  })
-
-  await tx.wallet.update({
-    where: { id: walletId },
-    data: { balance: newBalance },
-  })
-
-  return createdTransaction
-}
-
-const handleUpdateBudgetSpending = async ({
-  tx,
-  userId,
-  values: { categoryId, amount },
-}: CreateTransactionServiceArgs) => {
-  const budgets = await tx.budget.findMany({
-    where: {
-      userId,
-      categories: { some: { id: categoryId } },
-    },
-  })
-
-  const updates = budgets.map((budget) => {
-    return tx.budget.update({
-      where: { id: budget.id },
-      data: { spent: Number(budget.spent) + amount },
-    })
-  })
-
-  await Promise.all(updates)
 }

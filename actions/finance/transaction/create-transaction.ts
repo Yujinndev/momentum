@@ -5,7 +5,7 @@ import { Transaction } from '@/types/transaction'
 import { getAuthUser } from '@/actions/account/get-auth-user'
 import { createTransactionService } from '@/services/transaction/create-transaction'
 
-export type CreateTransactionArgs = {
+type CreateTransactionArgs = {
   values: Transaction
 }
 
