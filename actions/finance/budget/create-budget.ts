@@ -1,10 +1,8 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
 import { BudgetSetting } from '@/types/budget'
 import { getAuthUser } from '@/actions/account/get-auth-user'
-import { getRecurringPeriodDate } from '@/utils/get-recurring-period-date'
-import { normalizedBudgets } from '@/utils/budget-helpers'
+import { createBudgetService } from '@/services/budget/create-budget'
 
 type CreateBudgetArgs = {
   values: BudgetSetting
@@ -18,37 +16,7 @@ export const createBudget = async ({ values }: CreateBudgetArgs) => {
       throw new Error('No user found')
     }
 
-    const startDate = new Date()
-    const endDate = getRecurringPeriodDate({
-      startDate,
-      period: values.recurringPeriod,
-    })
-
-    const normalizedItems = normalizedBudgets(values)
-    const createdBudgets = normalizedItems.budgets.map(async (budget) => {
-      const budgetCategories = Array.isArray(budget.categories)
-        ? budget.categories.map((id) => ({ id }))
-        : { id: budget.categories }
-
-      const res = await prisma.budget.create({
-        data: {
-          ...budget,
-          startDate,
-          endDate,
-          userId: user.id,
-          recurringPeriod: values.recurringPeriod,
-          trackBy: values.method === 'ThreeBucket' ? 'ALL' : 'CATEGORY',
-          isRecurring: true,
-          categories: {
-            connect: budgetCategories,
-          },
-        },
-      })
-
-      return res
-    })
-
-    await Promise.all(createdBudgets)
+    await createBudgetService({ values, userId: user.id })
 
     return { success: { message: 'Successfully created budgets' } }
   } catch (error) {
