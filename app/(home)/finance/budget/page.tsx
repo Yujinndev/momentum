@@ -18,6 +18,7 @@ export default async function Page() {
     items: budgetPref.items,
     totalAmount: budgetPref.totalAmount,
     method: budgetPref.method,
+    budgetPrefId: budgetPref.budgetPreferenceId,
   }
 
   return (

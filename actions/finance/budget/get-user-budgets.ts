@@ -18,7 +18,11 @@ export const getUserBudgets = async () => {
 
       const currentDate = new Date()
       const userBudget = await tx.budget.findMany({
-        where: { userId: user.id, endDate: { lte: currentDate } },
+        where: {
+          userId: user.id,
+          endDate: { gte: currentDate },
+          deletedAt: null,
+        },
         include: { categories: { select: { id: true } } },
       })
 
@@ -41,6 +45,7 @@ export const getUserBudgets = async () => {
         totalAmount,
         items: budgets,
         method: userPreference.method,
+        budgetPreferenceId: userPreference.id,
       }
     })
 
