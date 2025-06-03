@@ -2,7 +2,9 @@ import { z } from 'zod'
 
 const threeBucketSchema = z.object({
   method: z.literal('ThreeBucket'),
-  recurringPeriod: z.enum(['DAILY', 'WEEKLY', 'MONTHLY', 'ANNUALLY', 'NONE']),
+  recurringPeriod: z
+    .enum(['DAILY', 'WEEKLY', 'MONTHLY', 'ANNUALLY', 'NONE'])
+    .nullable(),
   totalAmount: z.coerce
     .number()
     .positive({
@@ -12,6 +14,7 @@ const threeBucketSchema = z.object({
   buckets: z
     .array(
       z.object({
+        id: z.string().optional(),
         categories: z
           .array(z.coerce.number({ message: 'Category is required.' }))
           .min(1, { message: 'Category is required.' }),
@@ -28,6 +31,7 @@ const threeBucketSchema = z.object({
             message: 'Amount is required.',
           })
           .finite(),
+        spent: z.coerce.number().nullable(),
       })
     )
     .min(3)
@@ -44,25 +48,22 @@ const categoryBasedSchema = z.object({
   budgets: z
     .array(
       z.object({
+        id: z.string().optional(),
         categories: z.coerce
           .number({ message: 'Category is required.' })
           .positive()
           .finite(),
         name: z.string().min(1, { message: 'Name is required.' }),
-        percentage: z.coerce.number().nonnegative().finite().default(0),
-        recurringPeriod: z.enum([
-          'DAILY',
-          'WEEKLY',
-          'MONTHLY',
-          'ANNUALLY',
-          'NONE',
-        ]),
+        recurringPeriod: z
+          .enum(['DAILY', 'WEEKLY', 'MONTHLY', 'ANNUALLY', 'NONE'])
+          .nullable(),
         totalAmount: z.coerce
           .number()
           .positive({
             message: 'Amount is required.',
           })
           .finite(),
+        spent: z.coerce.number().nullable(),
       })
     )
     .min(1, { message: 'Kindly add your budget' }),

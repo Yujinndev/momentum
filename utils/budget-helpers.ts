@@ -15,14 +15,3 @@ export const isCategoryBasedBudget = (
 ): budget is CategoryBasedBudget => {
   return budget.method === 'CategoryBased'
 }
-
-export const normalizedBudgets = (values: BudgetSetting) => {
-  if (isThreeBucketBudget(values)) {
-    return {
-      ...values,
-      budgets: values.buckets,
-    }
-  }
-
-  return values
-}
