@@ -8,6 +8,7 @@ type HandleNewTransactionArgs = {
   values: Transaction
   userId: string
   walletId: string
+  includeWalletUpdate?: boolean
 }
 
 export const handleNewTransaction = async ({
@@ -15,6 +16,7 @@ export const handleNewTransaction = async ({
   values,
   userId,
   walletId,
+  includeWalletUpdate = true,
 }: HandleNewTransactionArgs) => {
   const response = await getWallet({ tx: prisma, walletId })
 
@@ -37,10 +39,12 @@ export const handleNewTransaction = async ({
     },
   })
 
-  await prisma.wallet.update({
-    where: { id: walletId },
-    data: { balance: newBalance },
-  })
+  if (includeWalletUpdate) {
+    await prisma.wallet.update({
+      where: { id: walletId },
+      data: { balance: newBalance },
+    })
+  }
 
   return createdTransaction
 }

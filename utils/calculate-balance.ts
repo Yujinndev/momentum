@@ -13,17 +13,17 @@ export const calculateBalance = ({
   isSender?: boolean
 }) => {
   const amount = Number(txAmount)
-  const currenWalletBalance = Number(currentBalance)
+  const currentWalletBalance = Number(currentBalance)
 
   if (txType === 'TRANSFER') {
     return isSender
-      ? currenWalletBalance - amount
-      : currenWalletBalance + amount
+      ? currentWalletBalance - amount
+      : currentWalletBalance + amount
   }
 
   if (txType === 'INCOME') {
-    return currenWalletBalance + amount
+    return currentWalletBalance + amount
   }
 
-  return currenWalletBalance - amount
+  return currentWalletBalance - amount
 }

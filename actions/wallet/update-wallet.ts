@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma'
 import { Wallet } from '@/types/wallet'
 import { getAuthUser } from '@/actions/account/get-auth-user'
 import { revalidatePath } from 'next/cache'
+import { handleNewTransaction } from '@/services/transaction/handle-new-transaction'
+import { Transaction } from '@/types/transaction'
 
 type UpdateWalletArgs = {
   id: string
@@ -20,10 +22,29 @@ export const updateWallet = async ({ id, values }: UpdateWalletArgs) => {
 
     const updatedWallet = await prisma.$transaction(async (tx) => {
       const wallet = await tx.wallet.findFirstOrThrow({
-        where: {
-          AND: [{ userId: user.id }, { id: id }],
-        },
+        where: { id, userId: user.id },
       })
+
+      if (Number(values.balance) !== Number(wallet.balance)) {
+        const difference = Number(values.balance) - Number(wallet.balance)
+
+        const transactionValues = {
+          walletId: wallet.id,
+          description: 'Wallet Update',
+          type: difference > 0 ? 'INCOME' : 'EXPENSE',
+          amount: Math.abs(difference),
+          categoryId: 1,
+          transactionDate: new Date(),
+        } satisfies Transaction
+
+        await handleNewTransaction({
+          prisma: tx,
+          userId: user.id,
+          walletId: wallet.id,
+          values: transactionValues,
+          includeWalletUpdate: false,
+        })
+      }
 
       const updatedWallet = await tx.wallet.update({
         where: { id: wallet.id },
