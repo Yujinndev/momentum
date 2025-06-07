@@ -7,6 +7,7 @@ const main = async () => {
 
   await prisma.category.createMany({
     data: [
+      { name: 'Wallet Adjustment' },
       { name: 'Income' },
       { name: 'Transfer' },
       { name: 'Savings' },

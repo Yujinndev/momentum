@@ -126,25 +126,25 @@ export const RECURRING_PERIODS = [
   { label: 'Annually', value: 'ANNUALLY' },
 ] satisfies Array<Choice<string>>
 
-export const THREE_BUCKET_CATEGORIES = [7, 8, 9, 10, 12, 13, 14, 3, 6]
+export const THREE_BUCKET_CATEGORIES = [8, 9, 10, 11, 13, 14, 15, 4, 7]
 export const INITIAL_BUDGETS = {
   ThreeBucket: [
     {
-      categories: [7, 8, 9, 10],
+      categories: [8, 9, 10, 11],
       name: 'Needs',
       percentage: 60,
       totalAmount: 0,
       spent: 0,
     },
     {
-      categories: [12, 13, 14],
+      categories: [13, 14, 15],
       name: 'Wants',
       percentage: 20,
       totalAmount: 0,
       spent: 0,
     },
     {
-      categories: [3, 6],
+      categories: [4, 7],
       name: 'Savings',
       percentage: 20,
       totalAmount: 0,
