@@ -87,6 +87,7 @@ export const WalletForm = ({
             : 'Create a new wallet to organize your finances.'
         }
         isAllowBack={showBackButton}
+        className="h-max"
       />
 
       <SectionLayout className="h-max">
