@@ -25,15 +25,12 @@ export const useOnboardingNavigation = () => {
 }
 
 const getOnboardingState = (currentPage: string) => {
-  const totalSteps = ONBOARDING_STEPS.length
+  const totalSteps = ONBOARDING_STEPS.length - 1
   const currentPageIndex = ONBOARDING_STEPS.findIndex(
     (route) => route.link === currentPage
   )
 
-  const nextRouteIndex = Math.min(
-    Math.max(0, currentPageIndex + 1),
-    totalSteps - 1
-  )
+  const nextRouteIndex = Math.min(Math.max(0, currentPageIndex + 1), totalSteps)
 
   return {
     length: totalSteps,

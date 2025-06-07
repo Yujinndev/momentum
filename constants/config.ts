@@ -1,36 +1,14 @@
-export const FORM_DETAILS = {
-  wallet: {
-    create: {
-      title: 'Add New Wallet',
-      description: 'Create a new wallet to organize your finances.',
-      cta: {
-        default: 'Submit New Wallet',
-        pending: 'Creating new wallet...',
-      },
-    },
-    update: {
-      title: 'Update Wallet',
-      description: 'Synchronize updated details.',
-      cta: {
-        default: 'Update Wallet',
-        pending: 'Updating wallet...',
-      },
-    },
-    delete: {
-      cta: {
-        default: 'Remove Wallet',
-        pending: 'Removing Wallet...',
-      },
-    },
+export const ONBOARDING_STEPS = [
+  {
+    name: 'Get Started',
+    link: '/auth/onboarding',
   },
-  transaction: {
-    create: {
-      title: 'Add New Transaction',
-      description: 'Record your new transactions.',
-      cta: {
-        default: 'Add transaction',
-        pending: 'Adding transaction...',
-      },
-    },
+  {
+    name: 'Create your first wallet',
+    link: '/auth/onboarding/wallet',
   },
-}
+  {
+    name: 'Set your preferred budget',
+    link: '/auth/onboarding/budget-setting',
+  },
+]
