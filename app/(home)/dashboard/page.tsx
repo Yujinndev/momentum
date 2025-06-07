@@ -1,8 +1,8 @@
 import { WalletList } from './wallet-list'
 import { SectionLayout } from '@/components/layout/section-layout'
-import { TransactionList } from '@/components/finance/transaction-list'
-import { getUserTransactions } from '@/actions/finance/transaction/get-user-transactions'
-import { getUserWallets } from '@/actions/finance/wallet/get-user-wallets'
+import { TransactionList } from '@/components/features/transaction-list'
+import { getUserTransactions } from '@/actions/transaction/get-user-transactions'
+import { getUserWallets } from '@/actions/wallet/get-user-wallets'
 
 export default async function Dashboard() {
   const [transactions, wallets] = await Promise.all([

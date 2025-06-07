@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
-import { getUserBudgets } from '@/actions/finance/budget/get-user-budgets'
-import { getUserCategories } from '@/actions/finance/category/get-user-categories'
-import { BudgetSettingForm } from '@/components/finance/budget-form'
+import { getUserBudgets } from '@/actions/budget/get-user-budgets'
+import { getUserCategories } from '@/actions/category/get-user-categories'
+import { BudgetSettingForm } from '@/components/features/budget-form'
 import { BudgetFormProvider } from '@/contexts/budget-form-context'
 
 export default async function Page() {
@@ -11,7 +11,7 @@ export default async function Page() {
   ])
 
   if (budgetPref.error) {
-    redirect('/finance/budget')
+    redirect('/budget')
   }
 
   const currentUserBudgetPreference = {

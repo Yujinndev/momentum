@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { WalletWithId } from '@/types/wallet'
-import { WalletCard } from '@/components/finance/wallet-card'
+import { WalletCard } from '@/components/features/wallet-card'
 import { Button } from '@/components/ui/button'
 
 type WalletListProps = {
@@ -20,7 +20,7 @@ export function WalletList({ items }: WalletListProps) {
 
     if (wallet) {
       const id = wallet.getAttribute('data-id')
-      router.push(`/finance/wallet/${id}`)
+      router.push(`/wallet/${id}`)
     }
   }
 
@@ -33,7 +33,7 @@ export function WalletList({ items }: WalletListProps) {
           className="h-12 w-12 rounded-full"
           asChild
         >
-          <Link href="/finance/wallet/new">
+          <Link href="/wallet/new">
             <Plus />
           </Link>
         </Button>

@@ -15,6 +15,8 @@ export const getDefaultCategories = async () => {
       success: { message: 'Default categories fetched successfully' },
     }
   } catch (error) {
-    return { error: 'Failed to fetch default categories', details: error }
+    return {
+      error: { message: 'Failed to fetch default categories', details: error },
+    }
   }
 }

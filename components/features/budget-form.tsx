@@ -1,16 +1,15 @@
 'use client'
 
-import { MoveLeft } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import { useRouter } from 'next/navigation'
 import { ChangeEvent, useCallback, useMemo, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useFormContext } from 'react-hook-form'
 import { useBudgetForm } from '@/contexts/budget-form-context'
-import { createBudget } from '@/actions/finance/budget/create-budget'
-import { updateBudget } from '@/actions/finance/budget/update-budget'
-import { CategoryBasedFields } from '@/components/finance/category-based-fields'
-import { ThreeBucketFields } from '@/components/finance/three-buckets-fields'
+import { createBudget } from '@/actions/budget/create-budget'
+import { updateBudget } from '@/actions/budget/update-budget'
+import { CategoryBasedFields } from '@/components/features/category-based-fields'
+import { ThreeBucketFields } from '@/components/features/three-buckets-fields'
 import {
   BudgetSetting,
   budgetSettingSchema,
@@ -44,6 +43,7 @@ import {
 } from '@/constants/choices'
 import { cn } from '@/lib/utils'
 import { BudgetMethod } from '@prisma/client'
+import { FormBackRedirect } from '@/components/ui/form-back-redirect'
 
 type BudgetSettingFormProps = {
   budget?: {
@@ -123,10 +123,7 @@ export const BudgetSettingForm = ({
       : await createBudget({ values })
 
     if (response.error) {
-      return toast({
-        title: response.error.message,
-        description: 'Please try again.',
-      })
+      return form.setError('root', { message: response.error.message })
     }
 
     toast({
@@ -159,20 +156,10 @@ export const BudgetSettingForm = ({
 
   return (
     <div className="space-y-4">
-      <SectionLayout className="flex items-center gap-4">
-        <Button
-          variant="outline"
-          className="h-14 w-14 rounded-full p-2"
-          onClick={() => router.back()}
-        >
-          <MoveLeft className="!h-4 !w-4 lg:!h-6 lg:!w-6" />
-        </Button>
-
-        <div className="py-2">
-          <h2 className="text-lg font-bold">Manage Budgets</h2>
-          <p className="text-sm">Track your spendings</p>
-        </div>
-      </SectionLayout>
+      <FormBackRedirect
+        title="Manage Budgets"
+        description="Track your spendings"
+      />
 
       <Form {...form}>
         <form
@@ -273,6 +260,12 @@ export const BudgetSettingForm = ({
               )}
             </div>
           </div>
+
+          {form.formState.errors.root && (
+            <div className="text-red-500">
+              {form.formState.errors.root.message}
+            </div>
+          )}
 
           <Button
             className="btn-primary ml-auto w-full lg:w-[calc(50%-.8rem)]"

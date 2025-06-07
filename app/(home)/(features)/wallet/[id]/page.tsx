@@ -3,9 +3,9 @@ import { Plus } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { EditWalletForm } from './edit-form'
 import { DeleteWalletForm } from './delete-form'
-import { getWallet } from '@/actions/finance/wallet/get-wallet'
-import { TransactionList } from '@/components/finance/transaction-list'
-import { WalletCard } from '@/components/finance/wallet-card'
+import { getWallet } from '@/actions/wallet/get-wallet'
+import { TransactionList } from '@/components/features/transaction-list'
+import { WalletCard } from '@/components/features/wallet-card'
 import { Button } from '@/components/ui/button'
 
 export default async function Page({
@@ -17,7 +17,7 @@ export default async function Page({
   const response = await getWallet({ walletId: id })
 
   if (!response.wallet) {
-    redirect(`/finance/wallet/${id}`)
+    redirect(`/wallet/${id}`)
   }
 
   return (
@@ -31,9 +31,7 @@ export default async function Page({
             className="btn-primary group h-12 w-12 rounded-full"
             asChild
           >
-            <Link
-              href={`/finance/transaction/new?wallet-id=${response.wallet.id}`}
-            >
+            <Link href={`/transaction/new?wallet-id=${response.wallet.id}`}>
               <Plus className="group-hover:text-black" />
             </Link>
           </Button>

@@ -3,20 +3,18 @@
 import { cn } from '@/lib/utils'
 import { useForm } from 'react-hook-form'
 import { toast } from '@/hooks/use-toast'
-import { useRouter } from 'next/navigation'
-import { MoveLeft } from 'lucide-react'
-import { FORM_DETAILS } from '@/constants/config'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { WalletCard } from '@/components/finance/wallet-card'
+import { WalletCard } from '@/components/features/wallet-card'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { SectionLayout } from '@/components/layout/section-layout'
-import { createWallet } from '@/actions/finance/wallet/create-wallet'
-import { updateWallet } from '@/actions/finance/wallet/update-wallet'
+import { FormBackRedirect } from '@/components/ui/form-back-redirect'
 import { Wallet, walletSchema, WalletWithId } from '@/types/wallet'
 import { COLORSCHEMES, WALLET_TYPES } from '@/constants/choices'
+import { createWallet } from '@/actions/wallet/create-wallet'
+import { updateWallet } from '@/actions/wallet/update-wallet'
 import {
   Form,
   FormControl,
@@ -34,7 +32,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-type AddWalletFormProps = {
+type WalletFormProps = {
   wallet?: WalletWithId
   onSubmitCallback?: () => void
   className?: string
@@ -46,9 +44,7 @@ export const WalletForm = ({
   onSubmitCallback,
   className,
   showBackButton = true,
-}: AddWalletFormProps) => {
-  const router = useRouter()
-
+}: WalletFormProps) => {
   const form = useForm<Wallet>({
     resolver: zodResolver(walletSchema),
     defaultValues: wallet ?? {
@@ -81,28 +77,17 @@ export const WalletForm = ({
     onSubmitCallback?.()
   }
 
-  const FORM_DETAIL = wallet
-    ? FORM_DETAILS.wallet.update
-    : FORM_DETAILS.wallet.create
-
   return (
     <div className={cn('relative mx-auto space-y-6 rounded-md', className)}>
-      <SectionLayout className="flex h-max items-center gap-4">
-        {showBackButton && (
-          <Button
-            variant="outline"
-            className="h-14 w-14 rounded-full p-2"
-            onClick={() => router.back()}
-          >
-            <MoveLeft className="!h-4 !w-4 lg:!h-6 lg:!w-6" />
-          </Button>
-        )}
-
-        <div className="py-2">
-          <h2 className="text-lg font-bold">{FORM_DETAIL.title}</h2>
-          <p className="text-sm">{FORM_DETAIL.description}</p>
-        </div>
-      </SectionLayout>
+      <FormBackRedirect
+        title={wallet ? 'Update Wallet' : 'Add New Wallet'}
+        description={
+          wallet
+            ? 'Synchronize updated details.'
+            : 'Create a new wallet to organize your finances.'
+        }
+        isAllowBack={showBackButton}
+      />
 
       <SectionLayout className="h-max">
         <Form {...form}>
@@ -258,15 +243,13 @@ export const WalletForm = ({
                   </div>
                 )}
 
-                <div className="flex items-center justify-between gap-4">
-                  <Button
-                    type="submit"
-                    className="btn-primary w-full"
-                    isLoading={form.formState.isSubmitting}
-                  >
-                    {wallet ? 'Save update' : 'Save new wallet'}
-                  </Button>
-                </div>
+                <Button
+                  type="submit"
+                  className="btn-primary w-full"
+                  isLoading={form.formState.isSubmitting}
+                >
+                  {wallet ? 'Save update' : 'Save new wallet'}
+                </Button>
               </div>
             </div>
           </form>

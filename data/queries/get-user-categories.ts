@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
-import { getUserCategories } from '@/actions/finance/category/get-user-categories'
 import { useSession } from 'next-auth/react'
+import { useQuery } from '@tanstack/react-query'
+import { getUserCategories } from '@/actions/category/get-user-categories'
 
 export const useUserCategories = () => {
   const user = useSession()

@@ -44,7 +44,7 @@ export const Budgets = ({ items, className }: BudgetsProps) => {
 
       <div className="border-t border-zinc-100 p-2 dark:border-zinc-800">
         <Button className="btn-primary" asChild>
-          <Link href="/finance/budget">
+          <Link href="/budget">
             <span>Manage Budgets</span>
             <MoveRight className="h-3.5 w-3.5" />
           </Link>

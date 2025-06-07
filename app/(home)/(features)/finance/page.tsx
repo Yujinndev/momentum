@@ -1,9 +1,9 @@
-import { Budgets } from '@/components/finance/budget-list'
-import { DataTable } from '@/components/finance/transactions'
+import { Budgets } from '@/components/features/budget-list'
+import { DataTable } from '@/components/features/transactions'
 import { SectionLayout } from '@/components/layout/section-layout'
-import { transaction } from '@/components/finance/transactions/columns'
-import { getUserBudgets } from '@/actions/finance/budget/get-user-budgets'
-import { getUserTransactions } from '@/actions/finance/transaction/get-user-transactions'
+import { transaction } from '@/components/features/transactions/columns'
+import { getUserBudgets } from '@/actions/budget/get-user-budgets'
+import { getUserTransactions } from '@/actions/transaction/get-user-transactions'
 
 export default async function Page() {
   const [budgets, transactions] = await Promise.all([

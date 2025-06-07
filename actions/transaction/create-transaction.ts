@@ -22,7 +22,7 @@ export const createTransaction = async ({ values }: CreateTransactionArgs) => {
       userId: user.id,
     })
 
-    revalidatePath('/finance/transaction/new')
+    revalidatePath('/transaction/new')
 
     return {
       success: { message: 'Transaction created successfully' },

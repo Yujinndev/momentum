@@ -1,6 +1,6 @@
 import { useSession } from 'next-auth/react'
 import { useQuery } from '@tanstack/react-query'
-import { getUserWallets } from '@/actions/finance/wallet/get-user-wallets'
+import { getUserWallets } from '@/actions/wallet/get-user-wallets'
 
 export const useUserWallets = () => {
   const user = useSession()

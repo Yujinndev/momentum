@@ -3,22 +3,20 @@
 import { useEffect, useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { MoveLeft } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Transaction, transactionSchema } from '@/types/transaction'
-import { createTransaction } from '@/actions/finance/transaction/create-transaction'
+import { createTransaction } from '@/actions/transaction/create-transaction'
 import {
   getWalletType,
   getColorScheme,
   getWalletById,
 } from '@/utils/get-values-from-choices'
 import { TRANSACTION_TYPES } from '@/constants/choices'
-import { FORM_DETAILS } from '@/constants/config'
 import { useToast } from '@/hooks/use-toast'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { WalletCard } from '@/components/finance/wallet-card'
+import { WalletCard } from '@/components/features/wallet-card'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { DatetimePicker } from '@/components/ui/date-time-picker'
 import {
@@ -40,6 +38,7 @@ import { SectionLayout } from '@/components/layout/section-layout'
 import { OptionSelect } from '@/components/ui/option-select'
 import { WalletWithId } from '@/types/wallet'
 import { Category } from '@prisma/client'
+import { FormBackRedirect } from '@/components/ui/form-back-redirect'
 
 type AddTransactionFormProps = {
   wallets: WalletWithId[]
@@ -128,24 +127,12 @@ export function AddTransactionForm({
     router.refresh()
   }
 
-  const { title, description, cta } = FORM_DETAILS.transaction.create
-
   return (
     <div className={cn('relative mx-auto space-y-6 rounded-md', className)}>
-      <SectionLayout className="flex items-center gap-4">
-        <Button
-          variant="outline"
-          className="h-14 w-14 rounded-full p-2"
-          onClick={() => router.back()}
-        >
-          <MoveLeft className="!h-4 !w-4 lg:!h-6 lg:!w-6" />
-        </Button>
-
-        <div className="py-2">
-          <h2 className="text-lg font-bold">{title}</h2>
-          <p className="text-sm">{description}</p>
-        </div>
-      </SectionLayout>
+      <FormBackRedirect
+        title="Add New Transaction"
+        description="Record your new transactions."
+      />
 
       <SectionLayout>
         <Form {...form}>
@@ -367,7 +354,7 @@ export function AddTransactionForm({
                   className="btn-primary w-full"
                   isLoading={form.formState.isSubmitting}
                 >
-                  {form.formState.isSubmitting ? cta.pending : cta.default}
+                  Save transaction
                 </Button>
               </div>
             </div>

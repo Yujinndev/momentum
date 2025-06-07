@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { WalletForm } from '@/components/finance/wallet-form'
+import { WalletForm } from '@/components/features/wallet-form'
 
 export default function Page() {
   const router = useRouter()

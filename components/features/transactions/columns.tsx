@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { DataTableColumnHeader } from './header'
 import { ColumnDef } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
-import { WalletCell } from '@/components/finance/transactions/wallet-cell'
+import { WalletCell } from '@/components/features/transactions/wallet-cell'
 import { getIconByTransactionType } from '@/utils/get-icon-by-transaction-type'
 import {
   DropdownMenu,

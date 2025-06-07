@@ -1,7 +1,7 @@
 import { Transaction } from '@/types/transaction'
 import { Prisma, PrismaClient } from '@prisma/client'
 import { calculateBalance } from '@/utils/calculate-balance'
-import { getWallet } from '@/actions/finance/wallet/get-wallet'
+import { getWallet } from '@/actions/wallet/get-wallet'
 
 type HandleNewTransactionArgs = {
   prisma: PrismaClient | Prisma.TransactionClient
@@ -19,7 +19,7 @@ export const handleNewTransaction = async ({
   const response = await getWallet({ tx: prisma, walletId })
 
   if (!response.wallet) {
-    throw new Error(response.error)
+    throw new Error(response.error.message)
   }
 
   const newBalance = calculateBalance({

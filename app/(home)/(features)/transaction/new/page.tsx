@@ -1,6 +1,6 @@
-import { getUserWallets } from '@/actions/finance/wallet/get-user-wallets'
-import { getUserCategories } from '@/actions/finance/category/get-user-categories'
-import { AddTransactionForm } from '@/components/finance/transactions/add-form'
+import { getUserWallets } from '@/actions/wallet/get-user-wallets'
+import { getUserCategories } from '@/actions/category/get-user-categories'
+import { AddTransactionForm } from '@/components/features/transactions/add-form'
 
 export default async function NewTransaction() {
   const [wallets, categories] = await Promise.all([

@@ -92,7 +92,7 @@ export function DataTable<TData, TValue>({
           <div className="flex w-full items-center justify-end gap-2 md:max-w-md">
             <DataTableViewOptions table={table} />
             <Button variant="secondary" className="w-full" asChild>
-              <Link href="/finance/transaction/new">
+              <Link href="/transaction/new">
                 <Plus /> Add
               </Link>
             </Button>

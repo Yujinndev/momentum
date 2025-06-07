@@ -16,7 +16,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { useRouter } from 'next/navigation'
-import { deleteWallet } from '@/actions/finance/wallet/delete-wallet'
+import { deleteWallet } from '@/actions/wallet/delete-wallet'
 
 type DeleteWalletFormProps = {
   wallet: WalletWithId

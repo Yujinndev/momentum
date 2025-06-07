@@ -1,7 +1,7 @@
 'use client'
 
 import { DialogFormWrapper } from '@/components/dialog-form-wrapper'
-import { WalletForm } from '@/components/finance/wallet-form'
+import { WalletForm } from '@/components/features/wallet-form'
 import { WalletWithId } from '@/types/wallet'
 import { Pencil } from 'lucide-react'
 import { useState } from 'react'

@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/form'
 import { COLORSCHEMES } from '@/constants/choices'
 import { Category, categorySchema } from '@/types/category'
-import { createCategory } from '@/actions/finance/category/create-category'
+import { createCategory } from '@/actions/category/create-category'
 
 type AddCategoryFormProps = {
   onSubmitCallback: () => void
@@ -35,7 +35,7 @@ export const AddCategoryForm = ({ onSubmitCallback }: AddCategoryFormProps) => {
     const response = await createCategory({ values })
 
     if (response.error) {
-      return form.setError('root', { message: response.error })
+      return form.setError('root', { message: response.error.message })
     }
 
     onSubmitCallback()

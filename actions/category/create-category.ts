@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { Category } from '@/types/category'
 import { getAuthUser } from '@/actions/account/get-auth-user'
-import { getDefaultCategories } from '@/actions/finance/category/get-default-categories'
+import { getDefaultCategories } from '@/actions/category/get-default-categories'
 
 type CreateCategoryArgs = {
   values: Category
