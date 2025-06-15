@@ -45,3 +45,47 @@ new aws.ec2.RouteTableAssociation("subnet2-assoc", {
   subnetId: subnet2.id,
   routeTableId: publicRouteTable.id,
 });
+
+const dbSubnetGroup = new aws.rds.SubnetGroup("db-subnet-group", {
+  name: "rds-subnet-group",
+  subnetIds: [subnet1.id, subnet2.id],
+});
+
+const dbSecurityGroup = new aws.ec2.SecurityGroup("db-security-group", {
+  vpcId: vpc.id,
+  ingress: [
+    {
+      fromPort: 5432,
+      toPort: 5432,
+      protocol: "tcp",
+      cidrBlocks: ["0.0.0.0/0"],
+    },
+  ],
+  egress: [
+    {
+      fromPort: 0,
+      toPort: 0,
+      protocol: "-1",
+      cidrBlocks: ["0.0.0.0/0"],
+    },
+  ],
+});
+
+const dbInstance = new aws.rds.Instance("momentum-postgres", {
+  identifier: "momentum-db",
+  instanceClass: aws.rds.InstanceType.T4G_Micro,
+  allocatedStorage: 10,
+  engine: "postgres",
+  dbName: "momentum",
+  username: "postgres",
+  password: dbPassword,
+  dbSubnetGroupName: dbSubnetGroup.name,
+  vpcSecurityGroupIds: [dbSecurityGroup.id],
+  publiclyAccessible: true,
+  skipFinalSnapshot: true,
+  tags: {
+    Name: "MomentumDB",
+  },
+});
+
+export const dbInstanceEndpoint = dbInstance.endpoint;
