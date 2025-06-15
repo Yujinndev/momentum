@@ -1,0 +1,25 @@
+{
+  "name": "momentum-infra",
+  "main": "index.ts",
+  "scripts": {
+    "infra:init": "pulumi stack init dev",
+    "infra:preview": "pulumi preview",
+    "infra:up": "pulumi up --yes",
+    "infra:destroy": "pulumi destroy --yes",
+    "infra:refresh": "pulumi refresh --yes",
+    "infra:logs": "pulumi logs -f",
+    "infra:whoami": "pulumi whoami",
+    "infra:stack": "pulumi stack",
+    "infra:select": "pulumi stack select dev",
+    "infra:output": "pulumi stack output"
+  },
+  "devDependencies": {
+    "@types/node": "^18",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@pulumi/aws": "^6.0.0",
+    "@pulumi/awsx": "^2.0.2",
+    "@pulumi/pulumi": "^3.113.0"
+  }
+}
