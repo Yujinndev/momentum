@@ -1,0 +1,350 @@
+datasource db {
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model User {
+    id                  String    @id @default(cuid())
+    name                String?
+    username            String?   @unique
+    email               String?   @unique
+    emailVerified       DateTime?
+    image               String?
+    onboardingCompleted Boolean   @default(false)
+    createdAt           DateTime  @default(now()) @db.Timestamptz(6)
+    updatedAt           DateTime  @updatedAt @db.Timestamptz(6)
+    deletedAt           DateTime? @db.Timestamptz(6)
+
+    // RELATIONS
+    accounts         Account[]
+    sessions         Session[]
+    wallets          Wallet[]
+    categories       Category[]
+    transactions     Transaction[]
+    savingsGoals     SavingsGoal[]
+    budgets          Budget[]
+    budgetPreference BudgetPreference[]
+
+    @@index([name])
+    @@index([email])
+    @@index([createdAt])
+    @@index([updatedAt])
+    @@index([deletedAt])
+}
+
+model Account {
+    id                       String    @id @default(cuid())
+    type                     String
+    provider                 String
+    providerAccountId        String
+    refresh_token            String?   @db.Text
+    access_token             String?   @db.Text
+    expires_at               Int?
+    token_type               String?
+    scope                    String?
+    id_token                 String?   @db.Text
+    session_state            String?
+    refresh_token_expires_in Int?
+    createdAt                DateTime  @default(now()) @db.Timestamptz(6)
+    updatedAt                DateTime  @updatedAt @db.Timestamptz(6)
+    deletedAt                DateTime? @db.Timestamptz(6)
+
+    // FOREIGN KEYS
+    userId String @unique
+
+    // RELATIONS
+    user User? @relation(fields: [userId], references: [id])
+
+    @@unique([provider, providerAccountId])
+    @@index([userId])
+    @@index([createdAt])
+    @@index([updatedAt])
+    @@index([deletedAt])
+}
+
+model Session {
+    id           String    @id @default(cuid())
+    sessionToken String    @unique
+    expires      DateTime
+    createdAt    DateTime  @default(now()) @db.Timestamptz(6)
+    updatedAt    DateTime  @updatedAt @db.Timestamptz(6)
+    deletedAt    DateTime? @db.Timestamptz(6)
+
+    // FOREIGN KEYS
+    userId String
+
+    // RELATIONS
+    user User? @relation(fields: [userId], references: [id])
+
+    @@index([userId])
+    @@index([createdAt])
+    @@index([updatedAt])
+    @@index([deletedAt])
+}
+
+model VerificationToken {
+    identifier String
+    token      String
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
+
+enum Color {
+    BLACK
+    WHITE
+    GREEN
+    RED
+    ORANGE
+    BLUE
+    PURPLE
+}
+
+enum WalletType {
+    GENERAL
+    CASH
+    BANK
+    E_WALLET
+    CREDIT_CARD
+    SAVINGS_ACCOUNT
+    INSURANCE
+    INVESTMENT
+}
+
+model Wallet {
+    id          String     @id @default(cuid())
+    name        String     @db.Text
+    description String?    @db.Text
+    balance     Decimal    @db.Decimal(10, 2)
+    isDefault   Boolean    @default(false)
+    color       Color      @default(BLACK)
+    type        WalletType @default(GENERAL)
+    createdAt   DateTime   @default(now()) @db.Timestamptz(6)
+    updatedAt   DateTime   @updatedAt @db.Timestamptz(6)
+    deletedAt   DateTime?  @db.Timestamptz(6)
+
+    // FOREIGN KEYS
+    userId String
+
+    // RELATIONS
+    user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+    transactions Transaction[]
+    savingsGoals SavingsGoal[]
+
+    @@index([name])
+    @@index([description])
+    @@index([createdAt])
+    @@index([updatedAt])
+    @@index([deletedAt])
+}
+
+enum TransactionType {
+    INCOME
+    EXPENSE
+    TRANSFER
+    SAVINGS
+}
+
+model Transaction {
+    id                   String          @id @default(cuid())
+    description          String
+    type                 TransactionType
+    amount               Decimal         @db.Decimal(10, 2)
+    walletRunningBalance Decimal         @db.Decimal(10, 2)
+    transactionDate      DateTime        @default(now()) @db.Timestamptz(6)
+    createdAt            DateTime        @default(now()) @db.Timestamptz(6)
+    updatedAt            DateTime        @updatedAt @db.Timestamptz(6)
+    deletedAt            DateTime?       @db.Timestamptz(6)
+
+    // FOREIGN KEYS
+    userId        String
+    walletId      String
+    categoryId    Int
+    budgetId      String?
+    savingsGoalId String?
+
+    // RELATIONS
+    user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+    wallet      Wallet       @relation(fields: [walletId], references: [id], onDelete: Cascade)
+    category    Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+    savingsGoal SavingsGoal? @relation(fields: [savingsGoalId], references: [id], onDelete: Cascade)
+    budget      Budget?      @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
+    @@index([description])
+    @@index([type])
+    @@index([walletId])
+    @@index([createdAt])
+    @@index([updatedAt])
+    @@index([deletedAt])
+}
+
+model Category {
+    id        Int       @id @default(autoincrement())
+    name      String
+    color     Color     @default(BLACK)
+    createdAt DateTime  @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime  @updatedAt @db.Timestamptz(6)
+    deletedAt DateTime? @db.Timestamptz(6)
+
+    // FOREIGN KEYS
+    userId String?
+
+    // RELATIONS
+    user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+    budgets      Budget[]      @relation(name: "BudgetToCategories")
+    transactions Transaction[]
+
+    @@index([name])
+    @@index([createdAt])
+    @@index([updatedAt])
+    @@index([deletedAt])
+}
+
+enum RecurringPeriod {
+    DAILY
+    WEEKLY
+    MONTHLY
+    ANNUALLY
+}
+
+enum BudgetMethod {
+    ThreeBucket
+    CategoryBased
+}
+
+model BudgetPreference {
+    id        Int          @id @default(autoincrement())
+    method    BudgetMethod
+    createdAt DateTime?    @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime?    @updatedAt @db.Timestamptz(6)
+
+    // FOREIGN KEYS
+    userId String
+
+    // RELATIONS
+    user User @relation(fields: [userId], references: [id])
+
+    @@index([id])
+    @@index([method])
+    @@index([createdAt])
+    @@index([updatedAt])
+}
+
+model Budget {
+    id              String           @id @default(cuid())
+    name            String
+    totalAmount     Decimal          @db.Decimal(10, 2)
+    percentage      Float?
+    spent           Decimal          @default(0) @db.Decimal(10, 2)
+    startDate       DateTime         @db.Timestamptz(6)
+    endDate         DateTime         @db.Timestamptz(6)
+    isRecurring     Boolean          @default(false)
+    recurringPeriod RecurringPeriod?
+    createdAt       DateTime?        @default(now()) @db.Timestamptz(6)
+    updatedAt       DateTime?        @updatedAt @db.Timestamptz(6)
+    deletedAt       DateTime?        @db.Timestamptz(6)
+
+    // FOREIGN KEYS
+    userId String
+
+    // RELATIONS
+    user         User          @relation(fields: [userId], references: [id])
+    categories   Category[]    @relation(name: "BudgetToCategories")
+    transactions Transaction[]
+
+    @@index([id])
+    @@index([name])
+    @@index([createdAt])
+    @@index([updatedAt])
+    @@index([deletedAt])
+}
+
+enum GoalMethod {
+    Flexible
+    Recurring
+}
+
+model SavingsGoal {
+    id            String     @id @default(cuid())
+    name          String
+    description   String?
+    currentAmount Decimal    @default(0) @db.Decimal(10, 2)
+    targetAmount  Decimal    @db.Decimal(10, 2)
+    endDate       DateTime?  @db.Timestamptz(6)
+    method        GoalMethod
+    createdAt     DateTime   @default(now()) @db.Timestamptz(6)
+    updatedAt     DateTime   @updatedAt @db.Timestamptz(6)
+    deletedAt     DateTime?  @db.Timestamptz(6)
+
+    // FOREIGN KEYS
+    userId   String
+    walletId String?
+
+    // RELATIONS
+    user            User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+    wallet          Wallet?              @relation(fields: [walletId], references: [id])
+    transactions    Transaction[]
+    contributions   SavingContribution[]
+    savingSchedules SavingSchedule[]
+
+    @@index([name])
+    @@index([description])
+    @@index([createdAt])
+    @@index([updatedAt])
+    @@index([deletedAt])
+}
+
+model SavingContribution {
+    id        Int       @id @default(autoincrement())
+    amount    Decimal
+    createdAt DateTime  @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime  @updatedAt @db.Timestamptz(6)
+    deletedAt DateTime? @db.Timestamptz(6)
+
+    // FOREIGN KEYS
+    goalId String
+
+    // RELATIONS
+    goal SavingsGoal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+    @@index([id])
+    @@index([goalId])
+    @@index([createdAt])
+    @@index([updatedAt])
+    @@index([deletedAt])
+}
+
+enum ScheduleStatus {
+    PENDING
+    COMPLETED
+    AUTO_COMPLETED
+    SKIPPED
+}
+
+model SavingSchedule {
+    id            Int            @id @default(autoincrement())
+    amount        Decimal        @db.Decimal(10, 2)
+    status        ScheduleStatus @default(PENDING)
+    dueDate       DateTime       @db.Timestamptz(6)
+    autoCredit    Boolean
+    creditingDate DateTime?
+    completedAt   DateTime?
+
+    // FOREIGN KEYS
+    goalId String
+
+    // RELATIONS
+    goal SavingsGoal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+    @@index([id])
+    @@index([goalId])
+    @@index([dueDate])
+    @@index([status])
+    @@index([creditingDate])
+    @@index([completedAt])
+}
