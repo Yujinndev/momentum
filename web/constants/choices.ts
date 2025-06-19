@@ -1,6 +1,7 @@
 import { ColorScheme, Choice } from '@/types/choices'
 import {
   Banknote,
+  CalendarFold,
   Coins,
   CreditCard,
   DollarSign,
@@ -35,7 +36,6 @@ export const WALLET_TYPES = [
 export const TRANSACTION_TYPES = [
   { label: 'Expense', value: 'EXPENSE', icon: ShoppingCart },
   { label: 'Income', value: 'INCOME', icon: Wallet },
-  { label: 'Add to Savings', value: 'SAVINGS', icon: PiggyBank },
   { label: 'Transfer to another wallet', value: 'TRANSFER', icon: Send },
 ] satisfies Array<Choice<string>>
 
@@ -115,6 +115,19 @@ export const BUDGET_METHODS = [
     label: 'Method 2: Category-Based Budgeting',
     value: 'CategoryBased',
     icon: List,
+  },
+] satisfies Array<Choice<string>>
+
+export const SAVINGS_METHODS = [
+  {
+    label: 'Flexible: Any amount',
+    value: 'Flexible',
+    icon: Coins,
+  },
+  {
+    label: 'Recurring: Fixed scheduled deposits',
+    value: 'Recurring',
+    icon: CalendarFold,
   },
 ] satisfies Array<Choice<string>>
 

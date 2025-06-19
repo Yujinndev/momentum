@@ -25,14 +25,6 @@ const recurringSchema = baseGoalSchema.extend({
     })
     .positive()
     .finite(),
-  recurringDayOfMonth: z
-    .number({
-      required_error: 'Recurring day is required.',
-      invalid_type_error: 'Recurring day must be a number.',
-    })
-    .int()
-    .min(1, { message: 'Minimum day is 1.' })
-    .max(31, { message: 'Maximum day is 31.' }),
   timeFrame: z.coerce
     .number({
       required_error: 'TimeFrame is required.',
@@ -51,3 +43,36 @@ export const savingsGoalSchema = z.discriminatedUnion('method', [
 ])
 
 export type SavingsGoal = z.infer<typeof savingsGoalSchema>
+
+export type Contributions = {
+  id: number
+  createdAt: Date
+  updatedAt: Date
+  deletedAt: Date | null
+  amount: number
+  goalId: string
+}
+
+export type Schedules = {
+  id: number
+  status: 'PENDING' | 'COMPLETED' | 'AUTO_COMPLETED' | 'SKIPPED'
+  autoCredit: boolean
+  amount: number
+  goalId: string
+  dueDate: Date
+  creditingDate: Date | null
+  completedAt: Date | null
+}
+
+export type DetailedSavings = {
+  id: string
+  name: string
+  description: string | null
+  method: 'Flexible' | 'Recurring'
+  currentAmount: number
+  targetAmount: number
+  endDate: Date | null
+  walletId: string | null
+  schedules?: Schedules[]
+  contributions?: Contributions[]
+}

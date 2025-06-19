@@ -1,7 +1,8 @@
+import { addDays } from 'date-fns'
 import { prisma } from '@/lib/prisma'
-import { SavingsGoal } from '@/types/saving'
 import { getRecurringPeriodDate } from '@/utils/get-recurring-period-date'
-import { isRecurringSavingsGoal } from '@/utils/savings-helpers'
+import { isRecurringMethodSavingsGoal } from '@/utils/type-guards-schemas'
+import { SavingsGoal } from '@/types/saving'
 
 type CreateSavingsGoalServicelArgs = {
   values: SavingsGoal
@@ -23,25 +24,29 @@ export const createSavingsGoalService = async ({
       },
     })
 
-    if (isRecurringSavingsGoal(values)) {
+    if (isRecurringMethodSavingsGoal(values)) {
       const startDate = new Date()
       const countOfSchedules = Number(values.timeFrame)
       const recurrenceAmount = values.targetAmount / countOfSchedules
 
-      const savings = Array(countOfSchedules).map((_, index) => {
-        const dueDate = getRecurringPeriodDate({
-          startDate,
-          period: values.recurringPeriod,
-          multiplier: index + 1,
-        })
+      const savings = Array.from({ length: countOfSchedules }).map(
+        (_, index) => {
+          const dueDate = getRecurringPeriodDate({
+            startDate,
+            period: values.recurringPeriod,
+            multiplier: index + 1,
+          })
 
-        return {
-          dueDate,
-          goalId: goal.id,
-          amount: recurrenceAmount,
-          autoCredit: values.autoCredit,
+          return {
+            userId,
+            dueDate,
+            goalId: goal.id,
+            amount: recurrenceAmount,
+            autoCredit: values.autoCredit,
+            creditingDate: addDays(dueDate, 1),
+          }
         }
-      })
+      )
 
       await tx.savingSchedule.createMany({
         data: savings,
