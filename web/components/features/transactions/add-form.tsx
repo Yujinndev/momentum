@@ -18,7 +18,8 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { WalletCard } from '@/components/features/wallet-card'
 import { CurrencyInput } from '@/components/ui/currency-input'
-import { DatetimePicker } from '@/components/ui/date-time-picker'
+import { DateTimePicker } from '@/components/ui/date-time-picker'
+import { FormBackRedirect } from '@/components/ui/form-back-redirect'
 import {
   Form,
   FormControl,
@@ -38,7 +39,6 @@ import { SectionLayout } from '@/components/layout/section-layout'
 import { OptionSelect } from '@/components/ui/option-select'
 import { WalletWithId } from '@/types/wallet'
 import { Category } from '@prisma/client'
-import { FormBackRedirect } from '@/components/ui/form-back-redirect'
 
 type AddTransactionFormProps = {
   wallets: WalletWithId[]
@@ -326,16 +326,14 @@ export function AddTransactionForm({
                   control={form.control}
                   name="transactionDate"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Date of Transaction</FormLabel>
+                    <FormItem className="flex flex-col gap-1">
+                      <FormLabel>Transaction Date</FormLabel>
                       <FormControl>
-                        <DatetimePicker
-                          className="w-full"
+                        <DateTimePicker
                           {...field}
-                          format={[
-                            ['months', 'days', 'years'],
-                            ['hours', 'minutes', 'am/pm'],
-                          ]}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date('1900-01-01')
+                          }
                         />
                       </FormControl>
                       <FormMessage />

@@ -26,7 +26,7 @@ import { Label } from '@/components/ui/label'
 import {
   isCategoryBasedBudget,
   isThreeBucketBudget,
-} from '@/utils/budget-helpers'
+} from '@/utils/type-guards-schemas'
 import {
   Form,
   FormControl,
