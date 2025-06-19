@@ -155,7 +155,7 @@ const SelectButton = <T,>({
       disabled={disabled}
     >
       <motion.div
-        className="relative flex w-full items-center justify-between text-white"
+        className="relative flex w-full items-center gap-4 text-white"
         animate={{
           width: isSelected && hasAnimation ? 'auto' : '100%',
           paddingRight: isSelected && hasAnimation ? '1.5rem' : '0',
@@ -165,6 +165,7 @@ const SelectButton = <T,>({
           duration: 0.3,
         }}
       >
+        {choice.icon && <choice.icon />}
         <span>{choice.label}</span>
       </motion.div>
       <AnimatePresence>

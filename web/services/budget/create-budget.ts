@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { isThreeBucketBudget } from '@/utils/budget-helpers'
+import { isThreeBucketBudget } from '@/utils/type-guards-schemas'
 import { handleThreeBucketBudgets } from './handle-three-bucket-budgets'
 import { HandleCategoryBasedBudgets } from './handle-category-based-budgets'
 import { BudgetSetting } from '@/types/budget'

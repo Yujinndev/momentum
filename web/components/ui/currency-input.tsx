@@ -19,7 +19,7 @@ export const CurrencyInput = ({
   const PHCurrency = CURRENCIES[0]
 
   return (
-    <div className="relative flex h-full w-full items-center justify-center">
+    <div className="relative flex h-max w-full items-center justify-center">
       {showIcon && (
         <div className="border-e-none flex h-9 items-center justify-center rounded-md rounded-e-none border bg-muted-foreground/10 px-4">
           <PHCurrency.icon size={16} />
