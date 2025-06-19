@@ -3,6 +3,7 @@ import {
   CategoryBasedBudget,
   ThreeBucketBudget,
 } from '@/types/budget'
+import { RecurringSavingsGoal, SavingsGoal } from '@/types/saving'
 
 export const isThreeBucketBudget = (
   budget: BudgetSetting
@@ -14,4 +15,10 @@ export const isCategoryBasedBudget = (
   budget: BudgetSetting
 ): budget is CategoryBasedBudget => {
   return budget.method === 'CategoryBased'
+}
+
+export const isRecurringMethodSavingsGoal = (
+  goal: SavingsGoal
+): goal is RecurringSavingsGoal => {
+  return goal.method === 'Recurring'
 }
