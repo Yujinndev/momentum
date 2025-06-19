@@ -1,172 +1,162 @@
 'use client'
-import React, { forwardRef, useCallback } from 'react'
-import { useTimescape, type Options } from 'timescape/react'
 
-import { Input } from '@/components/ui/input'
+import * as React from 'react'
+import { CalendarIcon } from 'lucide-react'
+import { format } from 'date-fns'
+
 import { cn } from '@/lib/utils'
-// @source: https://github.com/dan-lee/timescape?tab=readme-ov-file
+import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { DayPicker } from 'react-day-picker'
 
-const timePickerInputBase =
-  'p-1 inline tabular-nums h-fit border-none outline-none select-none content-box caret-transparent rounded-sm min-w-8 text-center focus:bg-foreground/20 focus-visible:ring-0 focus-visible:outline-none'
-const timePickerSeparatorBase = 'text-xs text-gray-400'
-
-type DateFormat = 'days' | 'months' | 'years'
-type TimeFormat = 'hours' | 'minutes' | 'seconds' | 'am/pm'
-
-type DateTimeArray<T extends DateFormat | TimeFormat> = T[]
-type DateTimeFormatDefaults = [
-  DateTimeArray<DateFormat>,
-  DateTimeArray<TimeFormat>,
-]
-
-const DEFAULTS = [
-  ['months', 'days', 'years'],
-  ['hours', 'minutes', 'am/pm'],
-] as DateTimeFormatDefaults
-
-type TimescapeReturn = ReturnType<typeof useTimescape>
-type InputPlaceholders = Record<DateFormat | TimeFormat, string>
-const INPUT_PLACEHOLDERS: InputPlaceholders = {
-  months: 'MM',
-  days: 'DD',
-  years: 'YYYY',
-  hours: 'HH',
-  minutes: 'MM',
-  seconds: 'SS',
-  'am/pm': 'AM/PM',
-}
-
-/**
- * Date time picker Docs: {@link: https://shadcn-extension.vercel.app/docs/otp-input}
- */
-
-const DatetimeGrid = forwardRef<
-  HTMLDivElement,
-  {
-    format: DateTimeFormatDefaults
-    className?: string
-    timescape: Pick<TimescapeReturn, 'getRootProps' | 'getInputProps'>
-    placeholders: InputPlaceholders
-  }
->(
-  (
-    {
-      format,
-      className,
-      timescape,
-      placeholders,
-    }: {
-      format: DateTimeFormatDefaults
-      className?: string
-      timescape: Pick<TimescapeReturn, 'getRootProps' | 'getInputProps'>
-      placeholders: InputPlaceholders
-    },
-    ref
-  ) => {
-    return (
-      <div
-        className={cn(
-          'relative flex w-full items-center border-2 p-1',
-          className,
-          'gap-1 rounded-md border-input selection:bg-transparent selection:text-foreground'
-        )}
-        {...timescape.getRootProps()}
-        ref={ref}
-      >
-        {!!format?.length
-          ? format.map((group, i) => (
-              <React.Fragment key={i === 0 ? 'dates' : 'times'}>
-                {!!group?.length
-                  ? group.map((unit, j) => (
-                      <React.Fragment key={unit}>
-                        <Input
-                          className={cn(timePickerInputBase, 'min-w-8 flex-1', {
-                            'min-w-12': unit === 'years',
-                            'bg-foreground/15': unit === 'am/pm',
-                          })}
-                          {...timescape.getInputProps(unit)}
-                          placeholder={placeholders[unit]}
-                        />
-                        {i === 0 && j < group.length - 1 ? (
-                          // date separator
-                          <span className={timePickerSeparatorBase}>/</span>
-                        ) : (
-                          j < group.length - 2 && (
-                            // time separator
-                            <span className={timePickerSeparatorBase}>:</span>
-                          )
-                        )}
-                      </React.Fragment>
-                    ))
-                  : null}
-                {format[1]?.length && !i ? (
-                  // date-time separator - only if both date and time are present
-                  <span
-                    className={cn(
-                      timePickerSeparatorBase,
-                      'text-xl opacity-30'
-                    )}
-                  >
-                    |
-                  </span>
-                ) : null}
-              </React.Fragment>
-            ))
-          : null}
-      </div>
-    )
-  }
-)
-
-DatetimeGrid.displayName = 'DatetimeGrid'
-
-interface DateTimeInput {
+type DateTimePicker = {
+  variant?: 'date' | 'dateTime'
   value?: Date
-  format: DateTimeFormatDefaults
-  placeholders?: InputPlaceholders
-  onChange?: Options['onChangeDate']
-  dtOptions?: Options
-  className?: string
-}
+  onChange?: (value: Date) => void
+} & Pick<React.ComponentProps<typeof DayPicker>, 'disabled'>
 
-const DEFAULT_TS_OPTIONS = {
-  date: new Date(),
-  hour12: true,
-}
-export const DatetimePicker = forwardRef<HTMLDivElement, DateTimeInput>(
-  (
-    {
-      value,
-      format = DEFAULTS,
-      placeholders,
-      dtOptions = DEFAULT_TS_OPTIONS,
-      onChange,
-      className,
-    },
-    ref
-  ) => {
-    const handleDateChange = useCallback(
-      (nextDate: Date | undefined) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-        onChange ? onChange(nextDate) : console.log(nextDate)
-      },
-      [onChange]
-    )
-    const timescape = useTimescape({
-      ...dtOptions,
-      ...(value && { date: value }),
-      onChangeDate: handleDateChange,
-    })
-    return (
-      <DatetimeGrid
-        format={format}
-        className={className}
-        timescape={timescape}
-        placeholders={placeholders ?? INPUT_PLACEHOLDERS}
-        ref={ref}
-      />
-    )
+export const DateTimePicker = ({
+  variant = 'dateTime',
+  value,
+  onChange,
+  disabled,
+}: DateTimePicker) => {
+  const [date, setDate] = React.useState<Date | undefined>(value)
+  const [isOpen, setIsOpen] = React.useState(false)
+
+  const hours = Array.from({ length: 12 }, (_, i) => i + 1)
+  const handleDateSelect = (selectedDate: Date | undefined) => {
+    if (selectedDate) {
+      setDate(selectedDate)
+      onChange?.(selectedDate)
+    }
   }
-)
 
-DatetimePicker.displayName = 'DatetimePicker'
+  const handleTimeChange = (
+    type: 'hour' | 'minute' | 'ampm',
+    value: string
+  ) => {
+    if (variant === 'date') return
+
+    if (date) {
+      const newDate = new Date(date)
+      if (type === 'hour') {
+        newDate.setHours(
+          (parseInt(value) % 12) + (newDate.getHours() >= 12 ? 12 : 0)
+        )
+      } else if (type === 'minute') {
+        newDate.setMinutes(parseInt(value))
+      } else if (type === 'ampm') {
+        const currentHours = newDate.getHours()
+        newDate.setHours(value === 'PM' ? currentHours + 12 : currentHours - 12)
+      }
+
+      setDate(newDate)
+      onChange?.(newDate)
+    }
+  }
+
+  const dateFormat =
+    variant === 'dateTime' ? 'MM/dd/yyyy hh:mm aa' : 'MM/dd/yyyy'
+
+  return (
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className={cn(
+            'h-11 w-full justify-start bg-zinc-50/70 pl-3 text-left font-normal dark:bg-zinc-900/70',
+            !date && 'text-muted-foreground'
+          )}
+        >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {date ? format(date, dateFormat) : <span>{dateFormat}</span>}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0">
+        <div className="sm:flex">
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={handleDateSelect}
+            disabled={disabled}
+          />
+
+          {variant === 'dateTime' && (
+            <div className="flex flex-col divide-y sm:h-[300px] sm:flex-row sm:divide-x sm:divide-y-0">
+              <ScrollArea className="w-64 sm:w-auto">
+                <div className="flex p-2 sm:flex-col">
+                  {hours.reverse().map((hour) => (
+                    <Button
+                      key={hour}
+                      size="icon"
+                      variant={
+                        date && date.getHours() % 12 === hour % 12
+                          ? 'default'
+                          : 'ghost'
+                      }
+                      className="aspect-square shrink-0 sm:w-full"
+                      onClick={() => handleTimeChange('hour', hour.toString())}
+                    >
+                      {hour}
+                    </Button>
+                  ))}
+                </div>
+                <ScrollBar orientation="horizontal" className="sm:hidden" />
+              </ScrollArea>
+              <ScrollArea className="w-64 sm:w-auto">
+                <div className="flex p-2 sm:flex-col">
+                  {Array.from({ length: 12 }, (_, i) => i * 5).map((minute) => (
+                    <Button
+                      key={minute}
+                      size="icon"
+                      variant={
+                        date && date.getMinutes() === minute
+                          ? 'default'
+                          : 'ghost'
+                      }
+                      className="aspect-square shrink-0 sm:w-full"
+                      onClick={() =>
+                        handleTimeChange('minute', minute.toString())
+                      }
+                    >
+                      {minute}
+                    </Button>
+                  ))}
+                </div>
+                <ScrollBar orientation="horizontal" className="sm:hidden" />
+              </ScrollArea>
+              <ScrollArea className="">
+                <div className="flex p-2 sm:flex-col">
+                  {['AM', 'PM'].map((ampm) => (
+                    <Button
+                      key={ampm}
+                      size="icon"
+                      variant={
+                        date &&
+                        ((ampm === 'AM' && date.getHours() < 12) ||
+                          (ampm === 'PM' && date.getHours() >= 12))
+                          ? 'default'
+                          : 'ghost'
+                      }
+                      className="aspect-square shrink-0 sm:w-full"
+                      onClick={() => handleTimeChange('ampm', ampm)}
+                    >
+                      {ampm}
+                    </Button>
+                  ))}
+                </div>
+              </ScrollArea>
+            </div>
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+}
