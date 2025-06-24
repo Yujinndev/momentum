@@ -1,3 +1,5 @@
 config:
   momentum-infra:dbPassword:
     secure: AAABAO+OOzJlpIJ0wgRG71U3CpZOyfVKXoMT+CVeIBjKMIhZaYx5jsc=
+  momentum-infra:DATABASE_URL:
+    secure: AAABAKf4pjVlH2CsFXQdsZO2rgJ8Lbw+0WRlFlLfPohl0nsV0aZIQHnopSWWvnR92hOwgxauGfvJgAzbr/DoGKvFG/x9BXwTIu2YYl1YVSzZ6kLFjvhgQ1wbO7QScURrZRbKsuo8Jsn8XveQxePhdvHpzc/0bBBjR/a9na4GeoteAN1u3vJ7

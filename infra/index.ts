@@ -1,1 +1,2 @@
-import "./rds";
+import './stacks/rds'
+import './stacks/lambda'
