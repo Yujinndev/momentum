@@ -1,5 +1,5 @@
 {
-  "name": "momentum-infra",
+  "name": "@momentum/infra",
   "main": "index.ts",
   "scripts": {
     "infra:init": "pulumi stack init dev",
@@ -11,15 +11,24 @@
     "infra:whoami": "pulumi whoami",
     "infra:stack": "pulumi stack",
     "infra:select": "pulumi stack select dev",
-    "infra:output": "pulumi stack output"
-  },
-  "devDependencies": {
-    "@types/node": "^18",
-    "typescript": "^5.0.0"
+    "infra:output": "pulumi stack output",
+    "build:lambda": "ts-node scripts/build-lambda.ts"
   },
   "dependencies": {
+    "@prisma/client": "^6.10.1",
+    "@pulumi/archive": "^0.3.3",
     "@pulumi/aws": "^6.0.0",
     "@pulumi/awsx": "^2.0.2",
-    "@pulumi/pulumi": "^3.113.0"
+    "@pulumi/pulumi": "^3.113.0",
+    "date-fns": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^18",
+    "esbuild": "^0.25.5",
+    "fs-extra": "^11.3.0",
+    "prisma": "^6.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.0"
   }
 }
