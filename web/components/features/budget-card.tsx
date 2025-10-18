@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils'
 import { DetailedBudget } from '@/types/budget'
+import { format } from 'date-fns'
 import { ShoppingBag } from 'lucide-react'
 
 type BudgetCardProps = {
@@ -8,16 +9,16 @@ type BudgetCardProps = {
 
 const statusConfig = {
   'on-track': {
-    class: 'text-emerald-600 dark:text-emerald-400',
-    bg: 'bg-emerald-100 dark:bg-emerald-900/30',
+    text: 'text-zinc-900 dark:text-zinc-100',
+    bg: 'bg-emerald-500 dark:bg-emerald-600',
   },
   warning: {
-    class: 'text-amber-600 dark:text-amber-400',
-    bg: 'bg-amber-100 dark:bg-amber-900/30',
+    text: 'text-amber-600 dark:text-amber-400',
+    bg: 'bg-amber-500 dark:bg-amber-600',
   },
   'over-budget': {
-    class: 'text-red-600 dark:text-red-400',
-    bg: 'bg-red-100 dark:bg-red-900/30',
+    text: 'text-red-600 dark:text-red-400',
+    bg: 'bg-red-500 dark:bg-red-600',
   },
 }
 
@@ -55,7 +56,7 @@ export const BudgetCard = ({ item }: BudgetCardProps) => {
           className={cn(
             'rounded-full px-2 py-0.5 text-[10px] font-medium capitalize',
             statusConfig[status].bg,
-            statusConfig[status].class
+            statusConfig[status].text
           )}
         >
           {status}
@@ -65,44 +66,28 @@ export const BudgetCard = ({ item }: BudgetCardProps) => {
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs">
           <p className="text-zinc-600 dark:text-zinc-400">
-            {item.spent} of {item.totalAmount}{' '}
-            <small className="capitalize">
-              ({item?.recurringPeriod?.toLowerCase()})
-            </small>
+            Php {item.spent} of Php {item.totalAmount}
           </p>
-          <span
-            className={cn(
-              'font-medium',
-              {
-                'text-red-600 dark:text-red-400': status === 'over-budget',
-              },
-              {
-                'text-amber-600 dark:text-amber-400': status === 'warning',
-              },
-              {
-                'text-zinc-900 dark:text-zinc-100': status === 'on-track',
-              }
-            )}
-          >
+
+          <span className={cn('font-medium', statusConfig[status].text)}>
             {progress}%
           </span>
         </div>
         <div className="h-1.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
           <div
-            className={cn(
-              'h-full rounded-full',
-              {
-                'bg-red-500 dark:bg-red-600': status === 'over-budget',
-              },
-              {
-                'bg-amber-500 dark:bg-amber-600': status === 'warning',
-              },
-              {
-                'bg-emerald-500 dark:bg-emerald-600': status === 'on-track',
-              }
-            )}
+            className={cn('h-full rounded-full', statusConfig[status].bg)}
             style={{ width: `${Math.min(progress, 100)}%` }}
           />
+        </div>
+
+        <div className="flex items-center justify-between text-xs">
+          <p className="text-zinc-600 dark:text-zinc-500">
+            {format(item.endDate, 'PPp')}
+          </p>
+
+          <span className="font-medium capitalize dark:text-zinc-500">
+            {item.recurringPeriod}
+          </span>
         </div>
       </div>
     </div>

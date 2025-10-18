@@ -22,8 +22,8 @@ export const Budgets = ({ items, className }: BudgetsProps) => {
         className
       )}
     >
-      <div className="p-4">
-        <div className="mb-3 flex items-center justify-between">
+      <section>
+        <div className="flex items-center justify-between border-b p-3">
           <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
             Budgets
             <span className="ml-1 text-xs font-normal text-zinc-600 dark:text-zinc-400">
@@ -35,12 +35,12 @@ export const Budgets = ({ items, className }: BudgetsProps) => {
           </span>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 xl:grid-cols-1">
+        <div className="grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-1">
           {items.map((item) => (
             <BudgetCard key={item.id} item={item} />
           ))}
         </div>
-      </div>
+      </section>
 
       <div className="border-t border-zinc-100 p-2 dark:border-zinc-800">
         <Button className="btn-primary" asChild>

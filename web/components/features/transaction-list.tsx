@@ -33,8 +33,8 @@ export const TransactionList = ({
         className
       )}
     >
-      <div className="p-4">
-        <div className="mb-3 flex items-center justify-between">
+      <section>
+        <div className="flex items-center justify-between border-b p-3">
           <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
             {title}
           </h2>
@@ -44,68 +44,78 @@ export const TransactionList = ({
           </span>
         </div>
 
-        <div className="space-y-1">
-          {items.slice(0, count).map((transaction) => {
-            const txType = TRANSACTION_TYPES.find(
-              (txType) => txType.value === transaction.type
-            )
+        <div className="p-4">
+          {items.length > 0 ? (
+            <div className="space-y-1">
+              {items.slice(0, count).map((transaction) => {
+                const txType = TRANSACTION_TYPES.find(
+                  (txType) => txType.value === transaction.type
+                )
 
-            return (
-              <div
-                key={transaction.id}
-                className={cn(
-                  'group flex items-center gap-3',
-                  'rounded-lg p-2',
-                  'hover:bg-zinc-100 dark:hover:bg-zinc-800/50',
-                  'transition-all duration-200'
-                )}
-              >
-                <div
-                  className={cn(
-                    'rounded-lg p-2',
-                    'bg-zinc-100 dark:bg-zinc-800',
-                    'border border-zinc-200 dark:border-zinc-700'
-                  )}
-                >
-                  {txType && (
-                    <txType.icon className="h-4 w-4 text-zinc-900 dark:text-zinc-100" />
-                  )}
-                </div>
-
-                <div className="flex min-w-0 flex-1 items-center justify-between">
-                  <div className="space-y-0.5">
-                    <h3 className="text-xs font-medium text-zinc-900 dark:text-zinc-100">
-                      {transaction.description}
-                    </h3>
-                    <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
-                      {formatTransactionDate(transaction.transactionDate)}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-1.5 pl-3">
-                    <span
+                return (
+                  <div
+                    key={transaction.id}
+                    className={cn(
+                      'group flex items-center gap-3',
+                      'rounded-lg p-2',
+                      'hover:bg-zinc-100 dark:hover:bg-zinc-800/50',
+                      'transition-all duration-200'
+                    )}
+                  >
+                    <div
                       className={cn(
-                        'text-xs font-medium',
-                        transaction.type === 'EXPENSE'
-                          ? 'text-red-600 dark:text-red-400'
-                          : 'text-emerald-600 dark:text-emerald-400'
+                        'rounded-lg p-2',
+                        'bg-zinc-100 dark:bg-zinc-800',
+                        'border border-zinc-200 dark:border-zinc-700'
                       )}
                     >
-                      {transaction.type === 'EXPENSE' ? '-' : '+'}
-                      {transaction.amount.toFixed(2)}
-                    </span>
-                    {transaction.type === 'EXPENSE' ? (
-                      <ArrowUpRight className="h-3.5 w-3.5 text-red-600 dark:text-red-400" />
-                    ) : (
-                      <ArrowDownLeft className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-                    )}
+                      {txType && (
+                        <txType.icon className="h-4 w-4 text-zinc-900 dark:text-zinc-100" />
+                      )}
+                    </div>
+
+                    <div className="flex min-w-0 flex-1 items-center justify-between">
+                      <div className="space-y-0.5">
+                        <h3 className="text-xs font-medium text-zinc-900 dark:text-zinc-100">
+                          {transaction.description}
+                        </h3>
+                        <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
+                          {formatTransactionDate(transaction.transactionDate)}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 pl-3">
+                        <span
+                          className={cn(
+                            'text-xs font-medium',
+                            transaction.type === 'EXPENSE'
+                              ? 'text-red-600 dark:text-red-400'
+                              : 'text-emerald-600 dark:text-emerald-400'
+                          )}
+                        >
+                          {transaction.type === 'EXPENSE' ? '-' : '+'}
+                          {transaction.amount.toFixed(2)}
+                        </span>
+                        {transaction.type === 'EXPENSE' ? (
+                          <ArrowUpRight className="h-3.5 w-3.5 text-red-600 dark:text-red-400" />
+                        ) : (
+                          <ArrowDownLeft className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            )
-          })}
+                )
+              })}
+            </div>
+          ) : (
+            <div className="group flex items-center justify-center gap-3 rounded-lg p-2">
+              <h3 className="text-xs font-medium text-muted-foreground">
+                No {title} found.
+              </h3>
+            </div>
+          )}
         </div>
-      </div>
+      </section>
 
       <div className="h-full" />
 

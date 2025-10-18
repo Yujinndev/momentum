@@ -16,9 +16,20 @@ export const createBudgetService = async ({
   return await prisma.$transaction(async (tx) => {
     const startDate = new Date()
 
-    await tx.budgetPreference.create({
-      data: { method: values.method, userId },
+    const budgetPref = await tx.budgetPreference.findFirst({
+      where: { userId },
     })
+
+    if (budgetPref && budgetPref.id) {
+      await tx.budgetPreference.update({
+        data: { method: values.method, userId },
+        where: { id: budgetPref.id },
+      })
+    } else {
+      await tx.budgetPreference.create({
+        data: { method: values.method, userId },
+      })
+    }
 
     const context = { prisma: tx, startDate, userId }
     if (isThreeBucketBudget(values)) {

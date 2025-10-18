@@ -3,6 +3,7 @@ import { SectionLayout } from '@/components/layout/section-layout'
 import { TransactionList } from '@/components/features/transaction-list'
 import { getUserTransactions } from '@/actions/transaction/get-user-transactions'
 import { getUserWallets } from '@/actions/wallet/get-user-wallets'
+import { ChartLineDefault } from './charts'
 
 export default async function Dashboard() {
   const [transactions, wallets] = await Promise.all([
@@ -16,7 +17,7 @@ export default async function Dashboard() {
 
       <div className="grid h-full gap-4 lg:grid-cols-2">
         <TransactionList items={transactions.items} count={5} />
-        <SectionLayout />
+        <ChartLineDefault />
       </div>
     </section>
   )

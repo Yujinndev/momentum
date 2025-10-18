@@ -1,6 +1,6 @@
 import { BaseArgs } from './base'
 import { CategoryBasedBudget } from '@/types/budget'
-import { getRecurringPeriodDate } from '@/utils/get-recurring-period-date'
+import { extractTimeConfig } from '@/utils/date'
 
 type HandleCategoryBasedBudgetsArgs = BaseArgs & {
   values: CategoryBasedBudget
@@ -14,22 +14,21 @@ export const HandleCategoryBasedBudgets = async ({
   isRetainingProgress,
 }: HandleCategoryBasedBudgetsArgs) => {
   const createdBudgets = values.budgets.map(async (budget) => {
-    const { id, category, ...rest } = budget
+    const { id, category, timeConfig, ...rest } = budget
 
-    const endDate = getRecurringPeriodDate({
-      startDate,
-      period: budget.recurringPeriod ?? 'NONE',
-    })
+    const { isRecurring, endDate, recurringPeriod } = extractTimeConfig(
+      budget.timeConfig,
+      startDate
+    )
 
     const data = {
       ...rest,
+      userId,
       startDate,
       endDate,
-      userId,
+      recurringPeriod,
+      isRecurring,
       spent: isRetainingProgress ? (budget.spent ?? 0) : 0,
-      recurringPeriod:
-        budget.recurringPeriod !== 'NONE' ? budget.recurringPeriod : null,
-      isRecurring: budget.recurringPeriod !== 'NONE',
       categories: {
         connect: { id: category },
       },

@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Form,
   FormControl,
@@ -67,6 +68,8 @@ export const SavingsGoalForm = ({ className }: SavingsGoalFormProps) => {
       title: response.success.message,
       description: 'You may view your updated goals.',
     })
+
+    form.reset()
   }
 
   const method = form.watch('method')
@@ -120,7 +123,7 @@ export const SavingsGoalForm = ({ className }: SavingsGoalFormProps) => {
                             variant="single"
                             className="relative h-full flex-1 rounded-md py-4"
                             contentContainerStyle="flex flex-col"
-                            choices={RECURRING_PERIODS.slice(1)}
+                            choices={RECURRING_PERIODS}
                             selected={field.value}
                             onSelectionChange={field.onChange}
                             hasAnimation={false}
@@ -135,20 +138,25 @@ export const SavingsGoalForm = ({ className }: SavingsGoalFormProps) => {
                     control={form.control}
                     name="autoCredit"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                        <FormControl>
+                      <FormItem className="w-full">
+                        <Label htmlFor="isAutoCredit" className="form-label">
                           <Checkbox
+                            id="isAutoCredit"
+                            className="form-checkbox"
                             checked={field.value}
                             onCheckedChange={field.onChange}
                           />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel>Auto Credit</FormLabel>
-                          <FormDescription>
-                            Turn this on to automatically add scheduled deposits
-                            based on your selected frequency.
-                          </FormDescription>
-                        </div>
+                          <div className="grid gap-1.5 font-normal">
+                            <p className="text-sm font-medium leading-none">
+                              Make this an auto credit?
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              Enable this to automatically add scheduled
+                              deposits based on your selected frequency. You can
+                              change or stop recurrence anytime.
+                            </p>
+                          </div>
+                        </Label>
                       </FormItem>
                     )}
                   />

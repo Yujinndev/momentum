@@ -25,6 +25,7 @@ export const BudgetFormProvider = ({
   const [selectedCategories, setSelectedCategories] = useState<number[]>(
     THREE_BUCKET_CATEGORIES
   )
+  const filteredCategories = categories.slice(1)
 
   const handleSelectCategory = (value: number) => {
     setSelectedCategories((prev) => {
@@ -39,7 +40,7 @@ export const BudgetFormProvider = ({
   return (
     <BudgetFormContext.Provider
       value={{
-        categories,
+        categories: filteredCategories,
         selectedCategories,
         setSelectedCategories,
         handleSelectCategory,

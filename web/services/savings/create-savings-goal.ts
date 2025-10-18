@@ -1,6 +1,6 @@
 import { addDays } from 'date-fns'
 import { prisma } from '@/lib/prisma'
-import { getRecurringPeriodDate } from '@/utils/get-recurring-period-date'
+import { getRecurringPeriodDate } from '@/utils/date'
 import { isRecurringMethodSavingsGoal } from '@/utils/type-guards-schemas'
 import { SavingsGoal } from '@/types/saving'
 

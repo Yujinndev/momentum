@@ -132,7 +132,6 @@ export const SAVINGS_METHODS = [
 ] satisfies Array<Choice<string>>
 
 export const RECURRING_PERIODS = [
-  { label: 'None', value: 'NONE' },
   { label: 'Daily', value: 'DAILY' },
   { label: 'Weekly', value: 'WEEKLY' },
   { label: 'Monthly', value: 'MONTHLY' },
@@ -172,7 +171,10 @@ export const INITIAL_BUDGETS = {
       totalAmount: 0,
       percentage: 0,
       spent: 0,
-      recurringPeriod: 'NONE' as const,
+      timeConfig: {
+        isRecurring: false as const,
+        endDate: new Date(),
+      },
     },
   ],
 }

@@ -23,7 +23,11 @@ export default async function Page() {
 
   return (
     <BudgetFormProvider categories={categories.items}>
-      <BudgetSettingForm budget={currentUserBudgetPreference} />
+      <BudgetSettingForm
+        budget={
+          budgetPref.items.length > 0 ? currentUserBudgetPreference : undefined
+        }
+      />
     </BudgetFormProvider>
   )
 }

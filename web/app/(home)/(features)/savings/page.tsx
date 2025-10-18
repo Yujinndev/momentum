@@ -34,11 +34,8 @@ export default async function Page() {
           {savings.schedules.length > 0 ? (
             <div className="space-y-2">
               {savings.schedules.map((schedule, index) => (
-                <Label
-                  key={index}
-                  className="flex items-start gap-3 rounded-lg border border-zinc-100 bg-zinc-50/70 p-3 has-[[aria-checked=true]]:border-zinc-600 has-[[aria-checked=true]]:bg-[#1c3052] dark:border-zinc-800 dark:bg-zinc-900/70 dark:has-[[aria-checked=true]]:border-blue-400 dark:has-[[aria-checked=true]]:bg-[#1c3052]"
-                >
-                  <Checkbox className="data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white dark:data-[state=checked]:border-blue-700 dark:data-[state=checked]:bg-blue-700" />
+                <Label key={index} className="form-label">
+                  <Checkbox className="form-checkbox" />
                   <div className="grid w-full gap-1.5 font-normal">
                     <div className="flex justify-between">
                       <p className="text-sm font-medium leading-none">
@@ -65,7 +62,7 @@ export default async function Page() {
         </SectionLayout>
       </div>
 
-      <SectionLayout className="px-3 py-3 xl:col-span-3">
+      <SectionLayout className="px-0 py-0 xl:col-span-3">
         <Savings items={savings.items} />
       </SectionLayout>
     </div>

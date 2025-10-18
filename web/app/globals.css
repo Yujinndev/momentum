@@ -90,6 +90,14 @@ body {
     @apply flex w-full transform items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-zinc-900 to-zinc-800 px-3 py-2 text-xs font-medium text-zinc-50 shadow-sm transition-all duration-200 hover:from-zinc-800 hover:to-zinc-700 hover:shadow focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 dark:from-zinc-50 dark:to-zinc-200 dark:text-zinc-900 dark:hover:from-zinc-200 dark:hover:to-zinc-300 dark:focus:ring-zinc-400 dark:focus:ring-offset-zinc-900;
   }
 
+  .form-label {
+    @apply flex items-start gap-3 rounded-lg border border-zinc-100 bg-zinc-50/70 p-6 has-[[aria-checked=true]]:border-zinc-600 has-[[aria-checked=true]]:bg-[#1c3052] has-[[aria-checked=true]]:text-white dark:border-zinc-800 dark:bg-zinc-900/70 dark:has-[[aria-checked=true]]:bg-[#1c3052];
+  }
+
+  .form-checkbox {
+    @apply data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white dark:data-[state=checked]:border-blue-700 dark:data-[state=checked]:bg-blue-700;
+  }
+
   .polygon {
     clip-path: polygon(0% 0%, 45% 0%, 70% 50%, 45% 100%, 0% 100%);
   }

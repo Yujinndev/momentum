@@ -1,16 +1,28 @@
 import { z } from 'zod'
 
+export const timeConfig = z.discriminatedUnion('isRecurring', [
+  z.object({
+    isRecurring: z.literal(true),
+    recurringPeriod: z.enum(['DAILY', 'WEEKLY', 'MONTHLY', 'ANNUALLY']),
+  }),
+  z.object({
+    isRecurring: z.literal(false),
+    endDate: z.coerce.date(),
+  }),
+])
+
+export type TimeConfig = z.infer<typeof timeConfig>
+
+// THREE-BUCKETS METHOD SCHEMA
 const threeBucketSchema = z.object({
   method: z.literal('ThreeBucket'),
-  recurringPeriod: z
-    .enum(['DAILY', 'WEEKLY', 'MONTHLY', 'ANNUALLY', 'NONE'])
-    .nullable(),
   totalAmount: z.coerce
     .number()
     .positive({
       message: 'Amount is required.',
     })
     .finite(),
+  timeConfig: timeConfig,
   buckets: z
     .array(
       z.object({
@@ -41,33 +53,47 @@ const threeBucketSchema = z.object({
       { message: 'Overall percentage must be equal to 100.' }
     ),
 })
+
 export type ThreeBucketBudget = z.infer<typeof threeBucketSchema>
+
+// const threeBucketSchema = z.object({
+//   method: z.literal('ThreeBucket'),
+//   recurringPeriod: z
+//     .enum(['DAILY', 'WEEKLY', 'MONTHLY', 'ANNUALLY', 'NONE'])
+//     .nullable(),
+//   totalAmount: z.coerce
+//     .number()
+//     .positive({
+//       message: 'Amount is required.',
+//     })
+//     .finite(),
+// })
+
+// CATEGORY-BASED METHOD SCHEMA
+const baseCategoryBudget = z.object({
+  id: z.string().optional(),
+  category: z.coerce
+    .number({ message: 'Category is required.' })
+    .positive({ message: 'Category is required.' })
+    .finite(),
+  name: z.string().min(1, { message: 'Name is required.' }),
+  totalAmount: z.coerce
+    .number()
+    .positive({
+      message: 'Amount is required.',
+    })
+    .finite(),
+  spent: z.coerce.number().nullable(),
+  timeConfig: timeConfig,
+})
 
 const categoryBasedSchema = z.object({
   method: z.literal('CategoryBased'),
   budgets: z
-    .array(
-      z.object({
-        id: z.string().optional(),
-        category: z.coerce
-          .number({ message: 'Category is required.' })
-          .positive()
-          .finite(),
-        name: z.string().min(1, { message: 'Name is required.' }),
-        recurringPeriod: z
-          .enum(['DAILY', 'WEEKLY', 'MONTHLY', 'ANNUALLY', 'NONE'])
-          .nullable(),
-        totalAmount: z.coerce
-          .number()
-          .positive({
-            message: 'Amount is required.',
-          })
-          .finite(),
-        spent: z.coerce.number().nullable(),
-      })
-    )
+    .array(baseCategoryBudget)
     .min(1, { message: 'Kindly add your budget' }),
 })
+
 export type CategoryBasedBudget = z.infer<typeof categoryBasedSchema>
 
 export const budgetSettingSchema = z.discriminatedUnion('method', [
@@ -90,6 +116,6 @@ export type DetailedBudget = {
   startDate: Date
   endDate: Date
   isRecurring: boolean
-  recurringPeriod: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'ANNUALLY' | 'NONE' | null
+  recurringPeriod: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'ANNUALLY' | null
   categories?: number[]
 }

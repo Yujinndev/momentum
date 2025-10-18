@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { CalendarIcon } from 'lucide-react'
-import { format } from 'date-fns'
+import { format, isDate } from 'date-fns'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -14,21 +14,28 @@ import {
 } from '@/components/ui/popover'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { DayPicker } from 'react-day-picker'
+import { PopoverProps } from '@radix-ui/react-popover'
 
 type DateTimePicker = {
   variant?: 'date' | 'dateTime'
   value?: Date
   onChange?: (value: Date) => void
-} & Pick<React.ComponentProps<typeof DayPicker>, 'disabled'>
+} & Pick<React.ComponentProps<typeof DayPicker>, 'disabled'> &
+  Pick<PopoverProps, 'modal'>
 
 export const DateTimePicker = ({
   variant = 'dateTime',
   value,
   onChange,
   disabled,
+  modal,
 }: DateTimePicker) => {
   const [date, setDate] = React.useState<Date | undefined>(value)
   const [isOpen, setIsOpen] = React.useState(false)
+
+  const isValidDate = date && isDate(date)
+  const dateFormat =
+    variant === 'dateTime' ? 'MM/dd/yyyy hh:mm aa' : 'MM/dd/yyyy'
 
   const hours = Array.from({ length: 12 }, (_, i) => i + 1)
   const handleDateSelect = (selectedDate: Date | undefined) => {
@@ -44,7 +51,7 @@ export const DateTimePicker = ({
   ) => {
     if (variant === 'date') return
 
-    if (date) {
+    if (isValidDate) {
       const newDate = new Date(date)
       if (type === 'hour') {
         newDate.setHours(
@@ -62,11 +69,12 @@ export const DateTimePicker = ({
     }
   }
 
-  const dateFormat =
-    variant === 'dateTime' ? 'MM/dd/yyyy hh:mm aa' : 'MM/dd/yyyy'
+  React.useEffect(() => {
+    setDate(date)
+  }, [date])
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
+    <Popover modal={modal} open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -76,7 +84,7 @@ export const DateTimePicker = ({
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, dateFormat) : <span>{dateFormat}</span>}
+          {isValidDate ? format(date, dateFormat) : <span>{dateFormat}</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
@@ -97,7 +105,7 @@ export const DateTimePicker = ({
                       key={hour}
                       size="icon"
                       variant={
-                        date && date.getHours() % 12 === hour % 12
+                        isValidDate && date.getHours() % 12 === hour % 12
                           ? 'default'
                           : 'ghost'
                       }
@@ -117,7 +125,7 @@ export const DateTimePicker = ({
                       key={minute}
                       size="icon"
                       variant={
-                        date && date.getMinutes() === minute
+                        isValidDate && date.getMinutes() === minute
                           ? 'default'
                           : 'ghost'
                       }
@@ -140,8 +148,12 @@ export const DateTimePicker = ({
                       size="icon"
                       variant={
                         date &&
-                        ((ampm === 'AM' && date.getHours() < 12) ||
-                          (ampm === 'PM' && date.getHours() >= 12))
+                        ((ampm === 'AM' &&
+                          isValidDate &&
+                          date.getHours() < 12) ||
+                          (ampm === 'PM' &&
+                            isValidDate &&
+                            date.getHours() >= 12))
                           ? 'default'
                           : 'ghost'
                       }

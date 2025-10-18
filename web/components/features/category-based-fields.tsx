@@ -30,6 +30,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { DateTimePicker } from '@/components/ui/date-time-picker'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 
 type BudgetProps = {
   index: number
@@ -92,7 +95,7 @@ export const CategoryBasedFields = () => {
         showTrigger={false}
         contentContainerClassName="max-w-md lg:max-w-md"
       >
-        <BudgetEdit index={selectedBudgetIndex} control={control} />
+        <BudgetEdit index={selectedBudgetIndex} />
       </DialogFormWrapper>
 
       <Button
@@ -110,7 +113,6 @@ export const CategoryBasedFields = () => {
           <BudgetPreview
             key={field.id}
             index={index}
-            control={control}
             totalBudgetsLength={fields.length}
           />
         ))}
@@ -121,10 +123,10 @@ export const CategoryBasedFields = () => {
 
 const BudgetEdit = ({
   index,
-  control,
-}: Omit<BudgetProps, 'totalBudgetsLength'>) => {
+}: Omit<BudgetProps, 'totalBudgetsLength' | 'control'>) => {
   const { categories, selectedCategories, handleSelectCategory } =
     useBudgetForm()
+  const { control, watch } = useFormContext<BudgetSetting>()
 
   if (index === -1) return null
 
@@ -160,16 +162,43 @@ const BudgetEdit = ({
 
       <FormField
         control={control}
-        name={`budgets.${index}.recurringPeriod`}
+        name={`budgets.${index}.timeConfig.isRecurring`}
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="w-full">
+            <Label htmlFor="isRecurring" className="form-label">
+              <Checkbox
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                id="isRecurring"
+                className="form-checkbox"
+              />
+              <div className="grid gap-1.5 font-normal">
+                <p className="text-sm font-medium leading-none">
+                  Make this a Recurring Budget?
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Enable this to automatically renew your budget based on your
+                  chosen schedule. You can change or stop recurrence anytime.
+                </p>
+              </div>
+            </Label>
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name={`budgets.${index}.timeConfig.recurringPeriod`}
+        render={({ field }) => (
+          <FormItem
+            className={cn('hidden w-full', {
+              block: watch(`budgets.${index}.timeConfig.isRecurring`),
+            })}
+          >
             <FormLabel>Recurring Period</FormLabel>
-            <Select
-              onValueChange={field.onChange}
-              defaultValue={field.value ?? 'NONE'}
-            >
+            <Select onValueChange={field.onChange} defaultValue={field.value}>
               <FormControl>
-                <SelectTrigger>
+                <SelectTrigger className="h-12">
                   <SelectValue placeholder="Select a recurring period" />
                 </SelectTrigger>
               </FormControl>
@@ -181,6 +210,29 @@ const BudgetEdit = ({
                 ))}
               </SelectContent>
             </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name={`budgets.${index}.timeConfig.endDate`}
+        render={({ field }) => (
+          <FormItem
+            className={cn('flex w-full flex-col gap-1', {
+              hidden: watch(`budgets.${index}.timeConfig.isRecurring`),
+            })}
+          >
+            <FormLabel>End Date</FormLabel>
+            <FormControl>
+              <DateTimePicker
+                {...field}
+                value={field.value ?? new Date()}
+                disabled={(date) => date < new Date('1900-01-01')}
+                modal={true}
+              />
+            </FormControl>
             <FormMessage />
           </FormItem>
         )}
@@ -216,9 +268,12 @@ const BudgetEdit = ({
   )
 }
 
-const BudgetPreview = ({ control, index, totalBudgetsLength }: BudgetProps) => {
+const BudgetPreview = ({
+  index,
+  totalBudgetsLength,
+}: Omit<BudgetProps, 'control'>) => {
   const { categories } = useBudgetForm()
-  const { formState } = useFormContext()
+  const { control, formState } = useFormContext()
 
   const budgets = useWatch({
     control,
@@ -262,9 +317,9 @@ const BudgetPreview = ({ control, index, totalBudgetsLength }: BudgetProps) => {
                 Unnamed
               </span>
             )}{' '}
-            {budgets.recurringPeriod && (
+            {budgets.timeConfig.recurringPeriod && (
               <span className="rounded-full border px-2 py-1 font-light text-zinc-400 dark:text-zinc-400">
-                {budgets.recurringPeriod}
+                {budgets.timeConfig.recurringPeriod}
               </span>
             )}
           </h3>

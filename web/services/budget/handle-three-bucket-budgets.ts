@@ -1,6 +1,6 @@
 import { BaseArgs } from './base'
 import { ThreeBucketBudget } from '@/types/budget'
-import { getRecurringPeriodDate } from '@/utils/get-recurring-period-date'
+import { extractTimeConfig } from '@/utils/date'
 
 type HandleThreeBucketBudgetsArgs = BaseArgs & {
   values: ThreeBucketBudget
@@ -13,10 +13,10 @@ export const handleThreeBucketBudgets = async ({
   userId,
   isRetainingProgress,
 }: HandleThreeBucketBudgetsArgs) => {
-  const endDate = getRecurringPeriodDate({
-    startDate,
-    period: values.recurringPeriod ?? 'NONE',
-  })
+  const { isRecurring, endDate, recurringPeriod } = extractTimeConfig(
+    values.timeConfig,
+    startDate
+  )
 
   const createdBuckets = values.buckets.map(async (bucket) => {
     const { id, ...rest } = bucket
@@ -26,10 +26,9 @@ export const handleThreeBucketBudgets = async ({
       startDate,
       endDate,
       userId,
+      recurringPeriod,
+      isRecurring,
       spent: isRetainingProgress ? (bucket.spent ?? 0) : 0,
-      recurringPeriod:
-        values.recurringPeriod !== 'NONE' ? values.recurringPeriod : null,
-      isRecurring: values.recurringPeriod !== 'NONE',
       categories: {
         connect: bucket.categories.map((id) => ({ id })),
       },

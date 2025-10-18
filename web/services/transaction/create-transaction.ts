@@ -33,8 +33,6 @@ export const createTransactionService = async ({
 
       case 'INCOME':
         break
-      case 'SAVINGS':
-        break
       default:
         break
     }
